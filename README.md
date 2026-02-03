@@ -115,3 +115,40 @@ Coverage output:
 - `coverage/`
 
 ---
+
+**Screenshots**
+Dashboard (Light)
+![Dashboard Light](projectScreenShoots/dashboard-light.png)
+
+Dashboard (Light - Skeleton)
+![Dashboard Light Skeleton](projectScreenShoots/dashboard-light-skeleton.png)
+
+Dashboard (Dark)
+![Dashboard Dark](projectScreenShoots/dashboard-dark.png)
+
+Customers List (Light)
+![Customers List Light](projectScreenShoots/customers-list-light.png)
+
+Customers List (Dark)
+![Customers List Dark](projectScreenShoots/customers-list-dark.png)
+
+Create Customer (Light)
+![Create Customer Light](projectScreenShoots/customer-create-light.png)
+
+Edit Customer (Light)
+![Edit Customer Light](projectScreenShoots/customer-edit-light.png)
+
+Edit Customer (Light - Validation)
+![Edit Customer Validation Light](projectScreenShoots/customer-edit-validation-light.png)
+
+Edit Customer (Dark - TR)
+![Edit Customer Dark TR](projectScreenShoots/customer-edit-dark-tr.png)
+
+Customer Detail (Light - TR)
+![Customer Detail Light TR](projectScreenShoots/customer-detail-light-tr.png)
+
+Customer Detail (Dark - TR)
+![Customer Detail Dark TR](projectScreenShoots/customer-detail-dark-tr.png)
+
+Delete Customer Modal (Dark - TR)
+![Delete Customer Modal Dark TR](projectScreenShoots/customer-delete-modal-dark-tr.png)
