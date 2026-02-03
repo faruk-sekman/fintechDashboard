@@ -1,0 +1,107 @@
+<div class="page-shell">
+  @if (loading$ | async) {
+    <div class="page-header items-center">
+      <div class="page-header-skeleton">
+        <app-ui-skeleton width="150px" height="30px"></app-ui-skeleton>
+        <app-ui-skeleton width="240px" height="15px"></app-ui-skeleton>
+      </div>
+      <app-ui-skeleton width="140px" height="38px" radius="12px"></app-ui-skeleton>
+    </div>
+
+    <div class="filters filters--skeleton">
+      <div class="form-field">
+        <app-ui-skeleton width="90px" height="12px"></app-ui-skeleton>
+        <app-ui-skeleton height="40px" radius="12px"></app-ui-skeleton>
+      </div>
+
+      <div class="form-field">
+        <app-ui-skeleton width="120px" height="12px"></app-ui-skeleton>
+        <app-ui-skeleton height="40px" radius="12px"></app-ui-skeleton>
+      </div>
+
+      <div class="form-field">
+        <app-ui-skeleton width="90px" height="12px"></app-ui-skeleton>
+        <app-ui-skeleton height="40px" radius="12px"></app-ui-skeleton>
+      </div>
+
+      <div class="form-field filters__actions">
+        <app-ui-skeleton width="110px" height="40px" radius="12px"></app-ui-skeleton>
+      </div>
+    </div>
+  } @else {
+    <div class="page-header items-center">
+      <div>
+        <h1 class="page-title">{{ 'customers.title' | translate }}</h1>
+        <p class="page-subtitle">{{ 'customers.subtitle' | translate }}</p>
+      </div>
+
+      <app-ui-button type="button" (click)="create()">
+        <i class="ri-user-add-line ui-button__icon" aria-hidden="true"></i>
+        {{ 'customers.create' | translate }}
+      </app-ui-button>
+    </div>
+
+    <div class="filters">
+      <div class="form-field">
+        <label>{{ 'customers.search' | translate }}</label>
+        <app-ui-input [control]="search" [placeholder]="'customers.searchPlaceholder' | translate"></app-ui-input>
+      </div>
+
+      <div class="form-field">
+        <label>{{ 'customers.kycStatus' | translate }}</label>
+        <app-ui-select [control]="kycStatus" [options]="kycStatusOptions"></app-ui-select>
+      </div>
+
+      <div class="form-field">
+        <label>{{ 'customers.active' | translate }}</label>
+        <app-ui-select [control]="isActive" [options]="activeOptions"></app-ui-select>
+      </div>
+
+      <div class="form-field filters__actions">
+        @if (hasActiveFilters) {
+          <app-ui-button size="md" variant="ghost" type="button" (click)="clearFilters()">
+            <i class="ri-filter-off-line ui-button__icon" aria-hidden="true"></i>
+            {{ 'common.clear' | translate }}
+          </app-ui-button>
+        }
+      </div>
+    </div>
+  }
+
+  <app-ui-table
+    [columns]="columns"
+    [data]="(data$ | async) ?? []"
+    [loading]="(loading$ | async) ?? false"
+    [page]="page"
+    [pageSize]="pageSize"
+    [total]="(total$ | async) ?? 0"
+    rowActionLabelKey="common.details"
+    (pageChange)="onPageChange($event)"
+  >
+    <ng-template #rowActions let-row>
+      <div class="row-actions">
+        <app-ui-button size="sm" variant="ghost" type="button" (click)="open(row)">
+          <i class="ri-eye-line ui-button__icon" aria-hidden="true"></i>
+         
+        </app-ui-button>
+
+        <app-ui-button size="sm" variant="danger" type="button" (click)="openDelete(row)">
+          <i class="ri-delete-bin-6-line ui-button__icon" aria-hidden="true"></i>
+    
+        </app-ui-button>
+      </div>
+    </ng-template>
+  </app-ui-table>
+
+  <app-ui-confirm-dialog
+    [open]="deleteModalOpen"
+    titleKey="customers.deleteTitle"
+    messageKey="customers.deleteConfirm"
+    [messageParams]="{ name: deleteTarget?.name ?? '' }"
+    confirmLabelKey="common.delete"
+    cancelLabelKey="common.cancel"
+    [loading]="(deletingTarget$ | async) ?? false"
+    (confirm)="confirmDelete()"
+    (cancel)="closeDelete()"
+  ></app-ui-confirm-dialog>
+</div>

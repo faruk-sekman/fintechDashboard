@@ -1,0 +1,7 @@
+<label class="ui-checkbox-field">
+  <input type="checkbox" class="ui-checkbox" [ngClass]="inputClass" [attr.id]="id || null"
+    [attr.readonly]="readOnly ? '' : null" [attr.disabled]="disabled" [formControl]="control" />
+  @if (label) {
+  <span class="ui-checkbox__label">{{ label }}</span>
+  }
+</label>

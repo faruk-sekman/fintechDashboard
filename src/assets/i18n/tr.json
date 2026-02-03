@@ -1,0 +1,149 @@
+{
+  "app": {
+    "title": "Fintech Operasyon Paneli",
+    "subtitle": "Müşteri operasyon portalı",
+    "footer": "Fintech İç Operasyon Paneli"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "customers": "Müşteriler"
+  },
+  "dashboard": {
+    "kpi": {
+      "totalCustomers": "Toplam Müşteri",
+      "totalCustomersHint": "Sistemdeki tüm müşteriler",
+      "activeRate": "Aktif Müşteri Oranı",
+      "kycStatus": "KYC Durumu Dağılımı",
+      "kycStatusHint": "Uyum durumu özeti",
+      "avgAge": "Ortalama Yaş",
+      "avgAgeHint": "Doğum tarihine göre hesaplanır",
+      "userCards": "Sistem Kullanıcıları",
+      "userCardHint": "Demo operasyon profili",
+      "latestUpdated": "Son Güncellenen Müşteri",
+      "latestUpdatedHint": "En son güncellenen profil"
+    },
+    "labels": {
+      "active": "aktif",
+      "inactive": "pasif",
+      "years": "yaş",
+      "updatedAt": "Güncellendi"
+    }
+  },
+  "common": {
+    "actions": "Aksiyonlar",
+    "details": "Detay",
+    "inspect": "İncele",
+    "noData": "Veri yok",
+    "total": "Toplam",
+    "prev": "Geri",
+    "next": "İleri",
+    "page": "Sayfa",
+    "all": "Hepsi",
+    "yes": "Evet",
+    "no": "Hayır",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor...",
+    "back": "Geri",
+    "edit": "Düzenle",
+    "create": "Oluştur",
+    "clear": "Temizle",
+    "filter": "Filtrele",
+    "reset": "Sıfırla",
+    "apply": "Uygula",
+    "delete": "Sil",
+    "cancel": "Vazgeç",
+    "confirm": "Onayla",
+    "deleting": "Siliniyor...",
+    "loading": "Yükleniyor...",
+    "search": "Arama",
+    "searchPlaceholder": "Aramak için yazın...",
+    "light": "Açık",
+    "dark": "Koyu",
+    "confirmMessage": "Emin misiniz?",
+    "menu": "Menü"
+  },
+  "customers": {
+    "title": "Müşteriler",
+    "subtitle": "Müşteri profillerini arayın ve yönetin",
+    "create": "Müşteri Oluştur",
+    "edit": "Müşteri Düzenle",
+    "created": "Müşteri oluşturuldu",
+    "updated": "Müşteri güncellendi",
+    "formSubtitle": "Müşteri bilgilerini dikkatli girin",
+    "search": "Arama",
+    "searchPlaceholder": "isim / e-posta / telefon / cüzdan / TCKN",
+    "name": "Ad Soyad",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "walletNumber": "Cüzdan Numarası",
+    "dateOfBirth": "Doğum Tarihi",
+    "nationalId": "TCKN",
+    "kycStatus": "KYC Durumu",
+    "active": "Aktif",
+    "deleteTitle": "Müşteriyi sil",
+    "deleteConfirm": "{{name}} adlı müşteriyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+    "deleted": "Müşteri silindi",
+    "address": {
+      "title": "Adres",
+      "country": "Ülke",
+      "city": "Şehir",
+      "postalCode": "Posta Kodu",
+      "line1": "Adres Satırı"
+    }
+  },
+  "customerDetail": {
+    "title": "Müşteri Detayı",
+    "subtitle": "Cüzdan özeti ve işlemler"
+  },
+  "wallet": {
+    "title": "Cüzdan",
+    "subtitle": "Bakiye ve limitler",
+    "balance": "Bakiye",
+    "dailyLimit": "Günlük Limit",
+    "monthlyLimit": "Aylık Limit",
+    "updated": "Cüzdan limitleri güncellendi"
+  },
+  "transactions": {
+    "title": "İşlemler",
+    "filters": "İşlem Filtreleri",
+    "type": "Tip",
+    "direction": "Yön",
+    "currency": "Para Birimi",
+    "from": "Başlangıç (createdAt ≥)",
+    "to": "Bitiş (createdAt ≤)",
+    "amount": "Tutar",
+    "createdAt": "Tarih",
+    "description": "Açıklama"
+  },
+  "validation": {
+    "required": "Bu alanın doldurulması zorunludur.",
+    "multipleSpaces": "Lütfen tek boşluk kullanarak giriniz.",
+    "email": "Lütfen geçerli bir e-posta adresi giriniz.",
+    "min": "Değer en az {{min}} olmalıdır.",
+    "max": "Değer en fazla {{max}} olmalıdır.",
+    "minLength": "En az {{min}} karakter giriniz.",
+    "maxLength": "En fazla {{max}} karakter giriniz.",
+    "surnameRequired": "Lütfen ad ve soyad bilgisini birlikte giriniz.",
+    "phoneInvalid": "Lütfen geçerli bir telefon numarası giriniz.",
+    "walletNumberInvalid": "Cüzdan numarası 16 haneli olmalıdır.",
+    "nameInvalid": "Ad alanı yalnızca harf, boşluk, kesme ve tire içerebilir.",
+    "unsafeChars": "İzin verilmeyen karakter kullanıldı.",
+    "dateInvalid": "Lütfen geçerli bir tarih seçiniz.",
+    "dateInFuture": "Tarih gelecekte olamaz.",
+    "minAge": "Müşteri en az {{min}} yaşında olmalıdır.",
+    "maxAge": "Müşteri yaşı en fazla {{max}} olmalıdır.",
+    "invalid": "Geçersiz değer.",
+    "limitMismatch": "Günlük limit aylık limitten küçük olmalıdır.",
+    "nationalIdNumeric": "TCKN yalnızca rakamlardan oluşmalıdır.",
+    "nationalIdLength": "TCKN 11 haneli olmalıdır.",
+    "nationalIdStartsWithZero": "TCKN 0 ile başlayamaz.",
+    "nationalIdChecksum": "TCKN doğrulaması başarısız."
+  },
+  "errors": {
+    "network": "Bağlantı hatası. İnternetinizi kontrol edin.",
+    "server": "Sistemsel bir hata oluştu. Daha sonra tekrar deneyin.",
+    "notFound": "Kayıt bulunamadı.",
+    "unknown": "Beklenmeyen bir hata oluştu.",
+    "validation": "Lütfen form alanlarını kontrol edin."
+  }
+}

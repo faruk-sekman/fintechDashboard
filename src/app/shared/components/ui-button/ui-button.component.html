@@ -1,0 +1,14 @@
+<button
+  class="ui-button {{ class }}"
+  [class.ui-button--primary]="variant === 'primary'"
+  [class.ui-button--ghost]="variant === 'ghost'"
+  [class.ui-button--danger]="variant === 'danger' || variant === 'red'"
+  [class.ui-button--red]="variant === 'red'"
+  [class.ui-button--sm]="size === 'sm'"
+  [class.ui-button--md]="size === 'md'"
+  [type]="type"
+  [disabled]="disabled"
+  [attr.id]="id || null"
+>
+  <ng-content></ng-content>
+</button>

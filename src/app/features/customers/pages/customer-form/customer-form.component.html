@@ -1,0 +1,76 @@
+<div class="page-shell">
+  <div class="page-header items-center">
+    @if (loading && !initialValue) {
+      <div>
+        <app-ui-skeleton width="200px" height="30px"></app-ui-skeleton>
+        <div class="mt-2">
+          <app-ui-skeleton width="260px" height="15px"></app-ui-skeleton>
+        </div>
+      </div>
+      <app-ui-skeleton width="90px" height="34px" radius="14px"></app-ui-skeleton>
+    } @else {
+      <div>
+        <h1 class="page-title">
+          {{ mode === 'create' ? ('customers.create' | translate) : ('customers.edit' | translate) }}
+        </h1>
+        <p class="page-subtitle">{{ 'customers.formSubtitle' | translate }}</p>
+      </div>
+
+      <app-ui-button variant="ghost" type="button" (click)="back()">
+        <i class="ri-arrow-left-line ui-button__icon" aria-hidden="true"></i>
+        {{ 'common.back' | translate }}
+      </app-ui-button>
+    }
+  </div>
+
+  <div class="card">
+    @if (loading && !initialValue) {
+      <div class="form-skeleton grid grid-cols-1 gap-4 md:grid-cols-2">
+        @for (i of [1,2,3,4,5,6,7,8,9,10,11,12]; track i) {
+          <div class="form-skeleton-field">
+            <app-ui-skeleton height="12px" width="120px"></app-ui-skeleton>
+            <app-ui-skeleton height="42px" radius="14px"></app-ui-skeleton>
+          </div>
+        }
+      </div>
+      <div class="form-actions mt-4 flex flex-wrap justify-end gap-2">
+        <app-ui-skeleton width="90px" height="34px" radius="14px"></app-ui-skeleton>
+        <app-ui-skeleton width="110px" height="34px" radius="14px"></app-ui-skeleton>
+      </div>
+    } @else {
+      <app-ui-form
+        #uiForm
+        [fields]="fields"
+        [initialValue]="initialValue"
+        [loading]="loading"
+        [submitLabelKey]="mode === 'create' ? 'customers.create' : 'common.save'"
+        [showSubmit]="false"
+        [formClass]="'grid grid-cols-2 gap-4 max-lg:grid-cols-1'"
+        (submitted)="onSubmit($event, uiForm)"
+      ></app-ui-form>
+      <div class="form-actions flex flex-wrap justify-end gap-2">
+        <app-ui-button
+          variant="ghost"
+          type="button"
+          [disabled]="loading || !uiForm?.hasChanges"
+          (click)="clearForm()"
+        >
+          <i class="ri-eraser-line ui-button__icon" aria-hidden="true"></i>
+          {{ 'common.clear' | translate }}
+        </app-ui-button>
+        <app-ui-button
+          type="button"
+          [disabled]="loading || !uiForm?.form || (mode === 'edit' && (uiForm.form.invalid || !uiForm.hasChanges))"
+          (click)="handleSubmit()"
+        >
+          <i class="ri-save-3-line ui-button__icon" aria-hidden="true"></i>
+          {{
+            loading
+              ? ('common.saving' | translate)
+              : (mode === 'create' ? ('customers.create' | translate) : ('common.save' | translate))
+          }}
+        </app-ui-button>
+      </div>
+    }
+  </div>
+</div>

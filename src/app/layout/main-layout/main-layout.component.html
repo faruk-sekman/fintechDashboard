@@ -1,0 +1,31 @@
+<div class="min-h-screen app-shell">
+  <app-header (menuToggle)="toggleMobileNav()"></app-header>
+
+  <div class="container mx-auto grid gap-5 py-3 lg:grid-cols-[220px_1fr]">
+    <div class="sidebar-wrap hidden h-[calc(100vh-55px)] self-start lg:sticky lg:top-0 lg:block">
+      <app-sidebar></app-sidebar>
+    </div>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+
+      <footer class="footer mt-8 text-xs footer-text">
+        {{ 'app.footer' | translate }}
+      </footer>
+    </main>
+  </div>
+
+  @if (mobileNavOpen) {
+    <div class="mobile-nav" (click)="closeMobileNav()">
+      <div class="mobile-nav__panel" (click)="$event.stopPropagation()">
+        <div class="mobile-nav__header">
+          <div class="mobile-nav__title">{{ 'common.menu' | translate }}</div>
+          <button type="button" class="mobile-nav__close" aria-label="Close menu" (click)="closeMobileNav()">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+        <app-sidebar (navigate)="closeMobileNav()"></app-sidebar>
+      </div>
+    </div>
+  }
+</div>

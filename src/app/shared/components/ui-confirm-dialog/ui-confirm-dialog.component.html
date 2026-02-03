@@ -1,0 +1,22 @@
+@if (open) {
+  <div class="confirm-overlay">
+    <div class="confirm-card" role="dialog" aria-modal="true">
+      <div class="confirm-icon">
+        <i [class]="icon" aria-hidden="true"></i>
+      </div>
+      <div class="confirm-content">
+        <h3 class="confirm-title">{{ titleKey | translate }}</h3>
+        <p class="confirm-message">{{ messageKey | translate: messageParams }}</p>
+        <div class="confirm-actions">
+          <app-ui-button type="button" variant="ghost" (click)="cancel.emit()" [disabled]="loading">
+            {{ cancelLabelKey | translate }}
+          </app-ui-button>
+          <app-ui-button type="button" variant="danger" (click)="confirm.emit()" [disabled]="loading">
+            <i class="ri-delete-bin-6-line ui-button__icon" aria-hidden="true"></i>
+            {{ loading ? (loadingLabelKey | translate) : (confirmLabelKey | translate) }}
+          </app-ui-button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

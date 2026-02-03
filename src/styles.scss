@@ -1,0 +1,17 @@
+@use "./styles/tokens";
+@use "./styles/spacing";
+@use "./styles/typography";
+@use "./styles/base";
+@use "./styles/utilities";
+@use "./styles/dashboard";
+@use "./styles/animations";
+@use "./styles/toastr" as app-toastr;
+@use "ngx-toastr/toastr" as ngx-toastr;
+@import "remixicon/fonts/remixicon.css";
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap');
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

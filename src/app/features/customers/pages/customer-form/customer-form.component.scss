@@ -1,0 +1,14 @@
+.page-shell {
+  max-width: 860px;
+}
+
+.form-skeleton {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.form-skeleton-field {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+}

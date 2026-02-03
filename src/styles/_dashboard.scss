@@ -1,0 +1,490 @@
+app-dashboard {
+  .hero {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    padding: var(--space-9);
+  }
+
+  .card {
+    --card-padding: var(--space-8);
+  }
+
+  .metric-label {
+    font-size: var(--font-size-xxs);
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-extrabold);
+
+    &--icon {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+
+      i {
+        font-size: var(--font-size-md);
+        color: var(--color-text-muted);
+      }
+    }
+  }
+
+  .metric-value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-black);
+    color: var(--color-text);
+    margin-top: var(--space-5);
+
+    &--xl {
+      font-size: var(--font-size-3xl);
+    }
+  }
+
+  .metric-hint {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--space-4);
+  }
+
+  .stat-card {
+    display: grid;
+    gap: var(--space-6);
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      background: radial-gradient(circle, rgb(var(--color-ink-rgb) / 0.1), transparent 70%);
+    }
+
+    &--age::after {
+      background: var(--glow-teal);
+    }
+  }
+
+  .stat-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .stat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: 999px;
+    background: var(--color-surface-2);
+    font-size: var(--font-size-xxs);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text);
+
+    &--muted {
+      color: var(--color-text-muted);
+    }
+  }
+
+  .kpi-card {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    min-height: 150px;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      right: calc(var(--space-15) * -1);
+      top: calc(var(--space-15) * -1);
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgb(var(--color-ink-rgb) / 0.06), transparent 70%);
+      pointer-events: none;
+    }
+
+    &--slate::after {
+      background: radial-gradient(circle, rgb(var(--color-ink-rgb) / 0.12), transparent 70%);
+    }
+
+    &--teal::after {
+      background: var(--glow-teal-soft);
+    }
+
+    &--emerald::after {
+      background: var(--glow-emerald);
+    }
+
+    &--indigo::after {
+      background: var(--glow-indigo);
+    }
+
+    &--purple::after {
+      background: var(--glow-purple);
+    }
+
+    &--amber::after {
+      background: var(--glow-amber);
+    }
+
+    .metric-value {
+      margin-top: 0;
+    }
+
+    .metric-hint {
+      margin-top: auto;
+    }
+  }
+
+  .mini-bar {
+    height: var(--space-4);
+    border-radius: 999px;
+    background: var(--color-surface-2);
+    display: flex;
+    overflow: hidden;
+  }
+
+  .mini-fill {
+    height: 100%;
+
+    &--active {
+      background: var(--color-success-strong);
+    }
+
+    &--inactive {
+      background: var(--color-border);
+    }
+  }
+
+  .mini-legend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--font-size-xxs);
+    color: var(--color-text-muted);
+  }
+
+  .dot {
+    width: var(--space-4);
+    height: var(--space-4);
+    border-radius: 999px;
+    display: inline-block;
+
+    &--active {
+      background: var(--color-success-strong);
+    }
+
+    &--inactive {
+      background: var(--color-text-soft);
+    }
+  }
+
+  .chart-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .chart-row {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .chart-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .chart-count {
+    font-size: var(--font-size-xxs);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-text);
+  }
+
+  .chart-bar {
+    height: var(--space-4);
+    border-radius: 999px;
+    background: var(--color-surface-2);
+    overflow: hidden;
+  }
+
+  .chart-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-chart-muted-from), var(--color-chart-muted-to));
+
+    &--verified {
+      background: linear-gradient(90deg, var(--color-chart-verified-from), var(--color-chart-verified-to));
+    }
+
+    &--contracted {
+      background: linear-gradient(90deg, var(--color-chart-contracted-from), var(--color-chart-contracted-to));
+    }
+
+    &--unverified {
+      background: linear-gradient(90deg, var(--color-chart-unverified-from), var(--color-chart-unverified-to));
+    }
+
+    &--unknown {
+      background: linear-gradient(90deg, var(--color-chart-muted-from), var(--color-chart-muted-to));
+    }
+  }
+
+  .chart-skeleton {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .chart-skeleton-row {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .chart-skeleton-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .user-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    border-radius: calc(var(--radius-sm) + 2px);
+    background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-3) 100%);
+    border: 1px solid var(--color-border);
+  }
+
+  .user-avatar {
+    display: grid;
+    place-items: center;
+    width: var(--space-15);
+    height: var(--space-15);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-text-strong));
+    color: var(--color-on-primary);
+    font-size: var(--font-size-lg);
+  }
+
+  .user-meta {
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+    flex: 1;
+  }
+
+  .user-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-username {
+    font-size: var(--font-size-xxs);
+    color: var(--color-text-muted);
+  }
+
+  .user-meta-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--font-size-xxs);
+    color: var(--color-text-subtle);
+
+    i {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-soft);
+    }
+  }
+
+  .user-side {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .user-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--font-size-xxs);
+    color: var(--color-text-subtle);
+
+    &--offline {
+      color: var(--color-text-subtle);
+
+      .user-dot {
+        background: var(--color-text-subtle);
+      }
+    }
+  }
+
+  .user-dot {
+    width: var(--space-4);
+    height: var(--space-4);
+    border-radius: 999px;
+    background: var(--color-success-strong);
+  }
+
+  .user-skeleton {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    border-radius: calc(var(--radius-sm) + 2px);
+    background: var(--color-surface-3);
+    border: 1px solid var(--color-border);
+  }
+
+  .user-skeleton-info {
+    display: grid;
+    gap: var(--space-3);
+    flex: 1;
+  }
+
+  .user-skeleton-side {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .latest-card {
+    gap: var(--space-5);
+  }
+
+  .person-card {
+    display: grid;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    border-radius: calc(var(--radius-sm) + 2px);
+    background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-3) 100%);
+    border: 1px solid var(--color-border);
+  }
+
+  .person-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+  }
+
+  .person-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: calc(var(--radius-sm) + 2px);
+    display: grid;
+    place-items: center;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-size: var(--font-size-xl);
+  }
+
+  .person-info {
+    display: grid;
+    gap: var(--space-1);
+    min-width: 0;
+    flex: 1;
+  }
+
+  .person-name {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .person-sub {
+    font-size: var(--font-size-xxs);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .person-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .person-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .person-icon {
+    font-size: var(--font-size-md);
+    color: var(--color-text-strong);
+  }
+
+  .person-text {
+    font-size: var(--font-size-xs);
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .person-balance {
+    font-weight: var(--font-weight-extrabold);
+  }
+
+  .person-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .detail-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    text-decoration: none;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-extrabold);
+
+    &:hover {
+      opacity: 0.95;
+    }
+  }
+
+  .person-skeleton {
+    display: grid;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    border-radius: calc(var(--radius-sm) + 2px);
+    background: var(--color-surface-3);
+    border: 1px solid var(--color-border);
+  }
+
+  .person-skeleton-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+  }
+
+  .person-skeleton-info {
+    display: grid;
+    gap: var(--space-3);
+    flex: 1;
+  }
+
+  .person-skeleton-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .person-skeleton-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

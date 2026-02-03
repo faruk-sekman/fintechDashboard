@@ -1,0 +1,149 @@
+{
+  "app": {
+    "title": "Fintech Operations Dashboard",
+    "subtitle": "Operations portal for customer",
+    "footer": "Fintech Operations"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "customers": "Customers"
+  },
+  "dashboard": {
+    "kpi": {
+      "totalCustomers": "Total Customers",
+      "totalCustomersHint": "All customers in the system",
+      "activeRate": "Active Customer Rate",
+      "kycStatus": "KYC Status Distribution",
+      "kycStatusHint": "Compliance overview by status",
+      "avgAge": "Average Age",
+      "avgAgeHint": "Calculated from date of birth",
+      "userCards": "System Users",
+      "userCardHint": "Demo operator profile",
+      "latestUpdated": "Latest Updated Customer",
+      "latestUpdatedHint": "Most recently updated profile"
+    },
+    "labels": {
+      "active": "active",
+      "inactive": "inactive",
+      "years": "yrs",
+      "updatedAt": "Updated"
+    }
+  },
+  "common": {
+    "actions": "Actions",
+    "details": "Details",
+    "inspect": "Inspect",
+    "noData": "No data",
+    "total": "Total",
+    "prev": "Prev",
+    "next": "Next",
+    "page": "Page",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No",
+    "save": "Save",
+    "saving": "Saving...",
+    "back": "Back",
+    "edit": "Edit",
+    "create": "Create",
+    "clear": "Clear",
+    "filter": "Filter",
+    "reset": "Reset",
+    "apply": "Apply",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "deleting": "Deleting...",
+    "loading": "Loading...",
+    "search": "Search",
+    "searchPlaceholder": "Type to search...",
+    "light": "Light",
+    "dark": "Dark",
+    "confirmMessage": "Are you sure?",
+    "menu": "Menu"
+  },
+  "customers": {
+    "title": "Customers",
+    "subtitle": "Search and manage customer profiles",
+    "create": "Create Customer",
+    "edit": "Edit Customer",
+    "created": "Customer created",
+    "updated": "Customer updated",
+    "formSubtitle": "Enter customer details carefully",
+    "search": "Search",
+    "searchPlaceholder": "name / email / phone / wallet / nationalId",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "walletNumber": "Wallet Number",
+    "dateOfBirth": "Date of Birth",
+    "nationalId": "National ID",
+    "kycStatus": "KYC Status",
+    "active": "Active",
+    "deleteTitle": "Delete customer",
+    "deleteConfirm": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+    "deleted": "Customer deleted",
+    "address": {
+      "title": "Address",
+      "country": "Country",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "line1": "Address Line"
+    }
+  },
+  "customerDetail": {
+    "title": "Customer Detail",
+    "subtitle": "Wallet summary and transactions"
+  },
+  "wallet": {
+    "title": "Wallet",
+    "subtitle": "Balance and limits",
+    "balance": "Balance",
+    "dailyLimit": "Daily Limit",
+    "monthlyLimit": "Monthly Limit",
+    "updated": "Wallet limits updated"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "filters": "Transaction Filters",
+    "type": "Type",
+    "direction": "Direction",
+    "currency": "Currency",
+    "from": "From (createdAt ≥)",
+    "to": "To (createdAt ≤)",
+    "amount": "Amount",
+    "createdAt": "Created At",
+    "description": "Description"
+  },
+  "validation": {
+    "required": "This field is mandatory.",
+    "multipleSpaces": "Please use a single space between words.",
+    "email": "Please enter a valid email address.",
+    "min": "Value must be at least {{min}}.",
+    "max": "Value must be at most {{max}}.",
+    "minLength": "Please enter at least {{min}} characters.",
+    "maxLength": "Please enter no more than {{max}} characters.",
+    "surnameRequired": "Please provide both first and last name.",
+    "phoneInvalid": "Please enter a valid phone number.",
+    "walletNumberInvalid": "Wallet number must be 16 digits.",
+    "nameInvalid": "Name may contain letters, spaces, apostrophes, and hyphens only.",
+    "unsafeChars": "Disallowed characters detected.",
+    "dateInvalid": "Please select a valid date.",
+    "dateInFuture": "Date cannot be in the future.",
+    "minAge": "Customer must be at least {{min}} years old.",
+    "maxAge": "Customer age must be no more than {{max}}.",
+    "invalid": "Invalid value.",
+    "limitMismatch": "Daily limit must be less than monthly limit.",
+    "nationalIdNumeric": "National ID must contain digits only.",
+    "nationalIdLength": "National ID must be 11 digits.",
+    "nationalIdStartsWithZero": "National ID cannot start with 0.",
+    "nationalIdChecksum": "National ID validation failed."
+  },
+  "errors": {
+    "network": "Network error. Please check your connection.",
+    "server": "A system error occurred. Please try again later.",
+    "notFound": "Record not found.",
+    "unknown": "Unexpected error occurred.",
+    "validation": "Please check the form fields."
+  }
+}

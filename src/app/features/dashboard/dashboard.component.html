@@ -1,0 +1,330 @@
+<div class="page-shell dashboard">
+  <div class="hero flex flex-col items-start md:flex-row md:items-center md:justify-between">
+    <div>
+      <h1 class="page-title">{{ 'nav.dashboard' | translate }}</h1>
+      <p class="page-subtitle">{{ 'app.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  @if (summaryVm$ | async; as vm) {
+    @let loading = (customersLoading$ | async);
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="card kpi-card stat-card kpi-card--slate">
+        <div class="metric-label metric-label--icon">
+          <i class="ri-group-line" aria-hidden="true"></i>
+          <span>{{ 'dashboard.kpi.totalCustomers' | translate }}</span>
+        </div>
+        @if (!loading) {
+          <div class="metric-value metric-value--xl">{{ vm.total | number }}</div>
+          <div class="stat-meta">
+            <div class="stat-chip">
+              <span class="dot dot--active"></span>
+              {{ vm.activeCount }} {{ 'dashboard.labels.active' | translate }}
+            </div>
+            <div class="stat-chip stat-chip--muted">
+              <span class="dot dot--inactive"></span>
+              {{ vm.inactiveCount }} {{ 'dashboard.labels.inactive' | translate }}
+            </div>
+          </div>
+        } @else {
+          <ng-container [ngTemplateOutlet]="kpiValueSkeleton"></ng-container>
+          <ng-container [ngTemplateOutlet]="kpiMetaSkeleton"></ng-container>
+        }
+      </div>
+<div class="card kpi-card kpi-card--emerald">
+        <div class="metric-label metric-label--icon">
+          <i class="ri-line-chart-line" aria-hidden="true"></i>
+          <span>{{ 'dashboard.kpi.activeRate' | translate }}</span>
+        </div>
+        @if (!loading) {
+          <div class="metric-value">{{ vm.activeRate }}%</div>
+        } @else {
+          <ng-container [ngTemplateOutlet]="kpiValueSkeleton"></ng-container>
+        }
+        @if (!loading) {
+          <div class="mini-bar">
+            <div class="mini-fill mini-fill--active" [style.width.%]="vm.activeRate"></div>
+            <div class="mini-fill mini-fill--inactive" [style.width.%]="vm.inactiveRate"></div>
+          </div>
+          <div class="mini-legend">
+            <span class="dot dot--active"></span>
+            <span>{{ vm.activeCount }} {{ 'dashboard.labels.active' | translate }}</span>
+            <span class="dot dot--inactive"></span>
+            <span>{{ vm.inactiveCount }} {{ 'dashboard.labels.inactive' | translate }}</span>
+          </div>
+        } @else {
+          <ng-container [ngTemplateOutlet]="barSkeleton"></ng-container>
+        }
+        <div class="metric-hint">
+          @if (!loading) {
+            {{ vm.activeCount }} / {{ vm.total }} {{ 'dashboard.labels.active' | translate }}
+          } @else {
+            <ng-container [ngTemplateOutlet]="kpiSmallSkeleton"></ng-container>
+          }
+        </div>
+      </div>
+      <div class="card kpi-card stat-card stat-card--age kpi-card--teal">
+        <div class="metric-label metric-label--icon">
+          <i class="ri-cake-2-line" aria-hidden="true"></i>
+          <span>{{ 'dashboard.kpi.avgAge' | translate }}</span>
+        </div>
+        @if (!loading) {
+          <div class="metric-value metric-value--xl">
+            {{ vm.avgAge !== null ? (vm.avgAge + ' ' + ('dashboard.labels.years' | translate)) : ('common.noData' | translate) }}
+          </div>
+          <div class="stat-meta">
+            @if (vm.minAge !== null && vm.maxAge !== null) {
+              <div class="stat-chip">
+                <i class="ri-arrow-down-line" aria-hidden="true"></i>
+                {{ vm.minAge }} {{ 'dashboard.labels.years' | translate }}
+              </div>
+              <div class="stat-chip">
+                <i class="ri-arrow-up-line" aria-hidden="true"></i>
+                {{ vm.maxAge }} {{ 'dashboard.labels.years' | translate }}
+              </div>
+            } @else {
+              <div class="stat-chip stat-chip--muted">{{ 'common.noData' | translate }}</div>
+            }
+          </div>
+        } @else {
+          <ng-container [ngTemplateOutlet]="kpiValueSkeleton"></ng-container>
+          <ng-container [ngTemplateOutlet]="kpiMetaSkeleton"></ng-container>
+        }
+      </div>
+
+      <div class="card kpi-card kpi-card--indigo">
+        <div class="metric-label metric-label--icon">
+          <i class="ri-shield-check-line" aria-hidden="true"></i>
+          <span>{{ 'dashboard.kpi.kycStatus' | translate }}</span>
+        </div>
+        @if (!loading) {
+          <div class="chart-list">
+            @for (item of vm.kycList; track item.status) {
+              <div class="chart-row">
+                <div class="chart-label">
+                  <app-customer-status-badge [status]="item.status"></app-customer-status-badge>
+                  <span class="chart-count">{{ item.count }}</span>
+                </div>
+                <div class="chart-bar">
+                  <span
+                    class="chart-fill"
+                    [class.chart-fill--verified]="item.status === 'VERIFIED'"
+                    [class.chart-fill--contracted]="item.status === 'CONTRACTED'"
+                    [class.chart-fill--unverified]="item.status === 'UNVERIFIED'"
+                    [class.chart-fill--unknown]="item.status === 'UNKNOWN'"
+                    [style.width.%]="vm.kycPercents[item.status]"
+                  ></span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <ng-container [ngTemplateOutlet]="listSkeleton"></ng-container>
+        }
+        <div class="metric-hint">{{ 'dashboard.kpi.kycStatusHint' | translate }}</div>
+      </div>
+    </div>
+
+    <div class="grid gap-3 md:grid-cols-2">
+      <div class="card kpi-card kpi-card--purple">
+        <div class="metric-label metric-label--icon">
+          <i class="ri-team-line" aria-hidden="true"></i>
+          <span>{{ 'dashboard.kpi.userCards' | translate }}</span>
+        </div>
+        @if (!loading) {
+          <div class="user-grid grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
+            @for (user of internalUsers; track user.username) {
+              <div class="user-card flex flex-col sm:flex-row">
+                <div class="user-avatar" aria-hidden="true">
+                  {{ user.initials }}
+                </div>
+                <div class="user-meta">
+                  <div class="user-name">{{ user.name }}</div>
+                  <div class="user-username">@{{ user.username }}</div>
+                  <div class="user-meta-row break-words sm:truncate">
+                    <i class="ri-mail-line" aria-hidden="true"></i>
+                    <span>{{ user.email }}</span>
+                  </div>
+                  <div class="user-meta-row break-words sm:truncate">
+                    <i class="ri-map-pin-2-line" aria-hidden="true"></i>
+                    <span>{{ user.location }}</span>
+                  </div>
+                </div>
+                <div class="user-side items-start justify-items-start sm:items-end sm:justify-items-end">
+                  <app-ui-badge [text]="user.role" [color]="user.role === 'Admin' ? 'blue' : 'purple'"></app-ui-badge>
+                  <div class="user-status" [class.user-status--offline]="user.status !== 'Online'">
+                    <span class="user-dot" aria-hidden="true"></span>
+                    <span>{{ user.status }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <ng-container [ngTemplateOutlet]="userSkeleton"></ng-container>
+        }
+        <div class="metric-hint">{{ 'dashboard.kpi.userCardHint' | translate }}</div>
+      </div>
+
+      <div class="card kpi-card latest-card kpi-card--amber">
+        <div class="metric-label metric-label--icon">
+          <i class="ri-time-line" aria-hidden="true"></i>
+          <span>{{ 'dashboard.kpi.latestUpdated' | translate }}</span>
+        </div>
+        @if (latestCustomerSummary$ | async; as latestDetail) {
+          @let latestLoading = (latestLoading$ | async);
+          @let latestLoaded = (latestLoaded$ | async);
+          @if (latestLoading) {
+            <ng-container [ngTemplateOutlet]="latestSkeleton"></ng-container>
+          } @else if (latestDetail.customer) {
+            <div class="person-card">
+              <div class="person-top">
+                <div class="person-avatar" aria-hidden="true">
+                  <i class="ri-user-3-line"></i>
+                </div>
+                <div class="person-info">
+                  <div class="person-name">{{ latestDetail.customer.name }}</div>
+                  <div class="person-sub">{{ latestDetail.customer.dateOfBirth }}</div>
+                </div>
+                <app-customer-status-badge [status]="latestDetail.customer.kycStatus"></app-customer-status-badge>
+              </div>
+
+              <div class="person-list">
+                <div class="person-item">
+                  <i class="ri-mail-line person-icon" aria-hidden="true"></i>
+                  <span class="person-text">{{ latestDetail.customer.email }}</span>
+                </div>
+                <div class="person-item">
+                  <i class="ri-phone-line person-icon" aria-hidden="true"></i>
+                  <span class="person-text">{{ latestDetail.customer.phone }}</span>
+                </div>
+                <div class="person-item">
+                  <i class="ri-map-pin-2-line person-icon" aria-hidden="true"></i>
+                  <span class="person-text">
+                    {{ latestDetail.customer.address.line1 }},
+                    {{ latestDetail.customer.address.city }},
+                    {{ latestDetail.customer.address.country }}
+                  </span>
+                </div>
+                @if (latestDetail.wallet; as wallet) {
+                  <div class="person-item">
+                    <i class="ri-wallet-3-line person-icon" aria-hidden="true"></i>
+                    <span class="person-text person-balance">
+                      {{ wallet.balance | number:'1.2-2' }} {{ wallet.currency }}
+                    </span>
+                  </div>
+                }
+              </div>
+
+              <div class="person-actions">
+                <a class="detail-btn" [routerLink]="['/customers', latestDetail.customer.id]">
+                  <i class="ri-external-link-line" aria-hidden="true"></i>
+                  {{ 'common.details' | translate }}
+                </a>
+              </div>
+            </div>
+          } @else if (latestLoaded) {
+            <div class="metric-value">{{ 'common.noData' | translate }}</div>
+          }
+        }
+        <div class="metric-hint">{{ 'dashboard.kpi.latestUpdatedHint' | translate }}</div>
+      </div>
+    </div>
+  }
+
+  <ng-template #kpiValueSkeleton>
+    <div class="metric-value">
+      <app-ui-skeleton variant="line" width="120px" height="20px"></app-ui-skeleton>
+    </div>
+  </ng-template>
+
+  <ng-template #kpiSmallSkeleton>
+    <app-ui-skeleton variant="line" width="140px" height="14px"></app-ui-skeleton>
+  </ng-template>
+
+  <ng-template #kpiMetaSkeleton>
+    <div class="stat-meta">
+      <app-ui-skeleton variant="line" width="120px" height="12px"></app-ui-skeleton>
+      <app-ui-skeleton variant="line" width="110px" height="12px"></app-ui-skeleton>
+    </div>
+  </ng-template>
+
+  <ng-template #listSkeleton>
+    <div class="chart-skeleton">
+      <div class="chart-skeleton-row">
+        <div class="chart-skeleton-label">
+          <app-ui-skeleton variant="line" width="90px" height="14px"></app-ui-skeleton>
+          <app-ui-skeleton variant="line" width="28px" height="14px"></app-ui-skeleton>
+        </div>
+        <app-ui-skeleton variant="line" width="100%" height="8px" radius="999px"></app-ui-skeleton>
+      </div>
+      <div class="chart-skeleton-row">
+        <div class="chart-skeleton-label">
+          <app-ui-skeleton variant="line" width="100px" height="14px"></app-ui-skeleton>
+          <app-ui-skeleton variant="line" width="28px" height="14px"></app-ui-skeleton>
+        </div>
+        <app-ui-skeleton variant="line" width="100%" height="8px" radius="999px"></app-ui-skeleton>
+      </div>
+      <div class="chart-skeleton-row">
+        <div class="chart-skeleton-label">
+          <app-ui-skeleton variant="line" width="110px" height="14px"></app-ui-skeleton>
+          <app-ui-skeleton variant="line" width="28px" height="14px"></app-ui-skeleton>
+        </div>
+        <app-ui-skeleton variant="line" width="100%" height="8px" radius="999px"></app-ui-skeleton>
+      </div>
+      <div class="chart-skeleton-row">
+        <div class="chart-skeleton-label">
+          <app-ui-skeleton variant="line" width="80px" height="14px"></app-ui-skeleton>
+          <app-ui-skeleton variant="line" width="28px" height="14px"></app-ui-skeleton>
+        </div>
+        <app-ui-skeleton variant="line" width="100%" height="8px" radius="999px"></app-ui-skeleton>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #barSkeleton>
+    <app-ui-skeleton variant="line" width="100%" height="10px"></app-ui-skeleton>
+  </ng-template>
+
+  <ng-template #userSkeleton>
+    <div class="user-grid grid grid-cols-1 gap-2 sm:grid-cols-2">
+      @for (item of [1,2,3,4]; track item) {
+        <div class="user-skeleton flex flex-col sm:flex-row">
+          <app-ui-skeleton variant="block" width="40px" height="40px" radius="12px"></app-ui-skeleton>
+          <div class="user-skeleton-info">
+            <app-ui-skeleton variant="line" width="100px" height="14px"></app-ui-skeleton>
+            <app-ui-skeleton variant="line" width="90px" height="12px"></app-ui-skeleton>
+            <app-ui-skeleton variant="line" width="120px" height="12px"></app-ui-skeleton>
+            <app-ui-skeleton variant="line" width="90px" height="12px"></app-ui-skeleton>
+          </div>
+          <div class="user-skeleton-side items-start justify-items-start sm:items-end sm:justify-items-end">
+            <app-ui-skeleton variant="line" width="70px" height="18px" radius="999px"></app-ui-skeleton>
+            <app-ui-skeleton variant="line" width="70px" height="12px"></app-ui-skeleton>
+          </div>
+        </div>
+      }
+    </div>
+  </ng-template>
+
+  <ng-template #latestSkeleton>
+    <div class="person-skeleton">
+      <div class="person-skeleton-top">
+        <app-ui-skeleton variant="block" width="42px" height="42px" radius="14px"></app-ui-skeleton>
+        <div class="person-skeleton-info">
+          <app-ui-skeleton variant="line" width="150px" height="14px"></app-ui-skeleton>
+          <app-ui-skeleton variant="line" width="90px" height="12px"></app-ui-skeleton>
+        </div>
+        <app-ui-skeleton variant="line" width="70px" height="18px" radius="999px"></app-ui-skeleton>
+      </div>
+      <div class="person-skeleton-list">
+        <app-ui-skeleton variant="line" width="220px" height="12px"></app-ui-skeleton>
+        <app-ui-skeleton variant="line" width="200px" height="12px"></app-ui-skeleton>
+        <app-ui-skeleton variant="line" width="240px" height="12px"></app-ui-skeleton>
+        <app-ui-skeleton variant="line" width="140px" height="12px"></app-ui-skeleton>
+      </div>
+      <div class="person-skeleton-actions">
+        <app-ui-skeleton variant="line" width="110px" height="30px" radius="12px"></app-ui-skeleton>
+      </div>
+    </div>
+  </ng-template>
+</div>

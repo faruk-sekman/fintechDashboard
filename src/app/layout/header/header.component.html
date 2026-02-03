@@ -1,0 +1,57 @@
+<header class="header">
+  <div class="container grid mx-auto">
+    <div class="header-row flex items-center justify-between py-3">
+      <div class="left flex items-center gap-3">
+        <button type="button" class="icon-btn menu-toggle" (click)="menuToggle.emit()" aria-label="Menu">
+          <i class="ri-menu-2-line" aria-hidden="true"></i>
+        </button>
+        <div class="logo">F</div>
+        <div class="brand-text">
+          <div class="title">{{ 'app.title' | translate }}</div>
+          <div class="subtitle">{{ 'app.subtitle' | translate }}</div>
+        </div>
+      </div>
+
+      <div class="right">
+        
+        <div class="theme">
+          <button type="button" [class.active]="theme() === 'light'" (click)="setTheme('light')">
+            <i class="ri-sun-line" aria-hidden="true"></i>
+            <span class="label">{{ 'common.light' | translate }}</span>
+          </button>
+          <button type="button" [class.active]="theme() === 'dark'" (click)="setTheme('dark')">
+            <i class="ri-moon-line" aria-hidden="true"></i>
+            <span class="label">{{ 'common.dark' | translate }}</span>
+          </button>
+        </div>
+        <div class="lang">
+          <button type="button" [class.active]="currentLang() === 'en'" (click)="switchLang('en')">EN</button>
+          <button type="button" [class.active]="currentLang() === 'tr'" (click)="switchLang('tr')">TR</button>
+        </div>
+        <div class="actions">
+      
+          <div class="user">
+            <div class="avatar" aria-hidden="true">
+              <i class="ri-user-3-line"></i>
+            </div>
+            <div class="user-meta">
+              <div class="user-name">Faruk Aydın</div>
+              <div class="user-role">Admin</div>
+            </div>
+            <button type="button" class="icon-btn" aria-label="Notifications">
+            <i class="ri-notification-3-line" aria-hidden="true"></i>
+          </button>
+            <button type="button" class="icon-btn logout" aria-label="Logout">
+              <i class="ri-logout-box-r-line" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="progress">
+      <div class="bar" [style.width.%]="(loading$ | async) ? 100 : 0"></div>
+    </div>
+  </div>
+</header>

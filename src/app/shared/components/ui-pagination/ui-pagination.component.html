@@ -1,0 +1,22 @@
+<div class="ui-pagination">
+  <app-ui-button size="sm" variant="ghost" type="button" (click)="prev()" [disabled]="page <= 1">
+    <i class="ri-arrow-left-s-line ui-button__icon" aria-hidden="true"></i>
+    {{ 'common.prev' | translate }}
+  </app-ui-button>
+
+  <div class="ui-pagination__pages">
+    @for (p of pages; track p; let i = $index) {
+      @if (i > 0 && p - pages[i - 1] > 1) {
+        <span class="ui-pagination__ellipsis">...</span>
+      }
+      <app-ui-button size="sm" [variant]="page === p ? 'primary' : 'ghost'" type="button" (click)="goTo(p)">
+        {{ p }}
+      </app-ui-button>
+    }
+  </div>
+
+  <app-ui-button size="sm" variant="ghost" type="button" (click)="next()" [disabled]="page >= totalPages">
+    {{ 'common.next' | translate }}
+    <i class="ri-arrow-right-s-line ui-button__icon" aria-hidden="true"></i>
+  </app-ui-button>
+</div>

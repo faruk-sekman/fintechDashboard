@@ -1,0 +1,10 @@
+<aside class="sidebar">
+  <a routerLink="/dashboard" routerLinkActive="active" (click)="navigate.emit()">
+    <i class="ri-dashboard-line sidebar__icon" aria-hidden="true"></i>
+    {{ 'nav.dashboard' | translate }}
+  </a>
+  <a routerLink="/customers" routerLinkActive="active" (click)="navigate.emit()">
+    <i class="ri-group-line sidebar__icon" aria-hidden="true"></i>
+    {{ 'nav.customers' | translate }}
+  </a>
+</aside>

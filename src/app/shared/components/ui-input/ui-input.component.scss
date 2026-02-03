@@ -1,0 +1,10 @@
+@use "../../../../styles/mixins" as mixins;
+
+:host {
+  display: block;
+}
+
+.ui-input {
+  @include mixins.control-base;
+  @include mixins.control-states(true);
+}

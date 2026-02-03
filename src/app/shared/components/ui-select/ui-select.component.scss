@@ -1,0 +1,39 @@
+@use "../../../../styles/mixins" as mixins;
+
+:host {
+  display: block;
+}
+
+.ui-select__wrap {
+  position: relative;
+  width: 100%;
+}
+
+.ui-select {
+  @include mixins.control-base;
+  @include mixins.control-states();
+  padding-right: var(--space-14);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.ui-select__icon {
+  position: absolute;
+  right: var(--space-7);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.ui-select.ui-form__control--invalid + .ui-select__icon,
+.ui-select.ui-form__control--valid + .ui-select__icon {
+  right: var(--space-14);
+}
+
+.ui-select:disabled + .ui-select__icon {
+  opacity: 0.5;
+}
