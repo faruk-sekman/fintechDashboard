@@ -129,7 +129,7 @@ Dashboard (Dark)
 Customers List (Light)
 ![Customers List Light](projectScreenShoots/customers-list-light.png)
 
-Customers List (Dark)
+Customers List Filter (Dark)
 ![Customers List Dark](projectScreenShoots/customers-list-dark.png)
 
 Create Customer (Light)
@@ -144,10 +144,10 @@ Edit Customer (Light - Validation)
 Edit Customer (Dark - TR)
 ![Edit Customer Dark TR](projectScreenShoots/customer-edit-dark-tr.png)
 
-Customer Detail (Light - TR)
+Customer Detail History Table(Light - TR)
 ![Customer Detail Light TR](projectScreenShoots/customer-detail-light-tr.png)
 
-Customer Detail (Dark - TR)
+Customer Detail History Table Filter & Wallet Update Data(Dark - TR)
 ![Customer Detail Dark TR](projectScreenShoots/customer-detail-dark-tr.png)
 
 Delete Customer Modal (Dark - TR)
