@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import {
   ChangeDetectionStrategy,
   Component,
@@ -105,17 +109,18 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
   /** Visual-only gauge fill for the SIMULATED risk level (no real score exists). */
   readonly levelPercent = computed(() => {
     const level = this.assessment()?.level;
-    return level === 'high' ? 100 : level === 'medium' ? 66 : level === 'low' ? 34 : 0;
+    if (level === 'high') return 100;
+    if (level === 'medium') return 66;
+    if (level === 'low') return 34;
+    return 0;
   });
 
   /** Deterministic, templated, i18n explanation — labeled "(heuristic)". */
   readonly explanation = computed(() => {
     const assessment = this.assessment();
     if (!assessment) return '';
-    const flagged = assessment.signals.filter((s) => s.hit);
-    const list = flagged.length
-      ? flagged.map((s) => this.i18n.instant(`web3.signals.${s.key}`)).join(', ')
-      : this.i18n.instant('web3.explanation.none');
+    const flagged = assessment.signals.filter(s => s.hit);
+    const list = this.signalExplanationList(flagged);
     return this.i18n.instant('web3.explanation.template', {
       count: flagged.length,
       list,
@@ -141,27 +146,29 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
 
   readonly vcJson = computed(() => {
     const vc = this.vc();
-    return vc ? JSON.stringify(vc, null, 2) : '';
+    if (!vc) return '';
+    return JSON.stringify(vc, null, 2);
   });
 
   ngOnInit(): void {
     this.route.paramMap
       .pipe(
-        map((params) => params.get('id')),
+        map(params => params.get('id')),
         filter((id): id is string => !!id),
         distinctUntilChanged(),
         tap(() => this.loadingCustomer.set(true)),
-        switchMap((id) =>
+        switchMap(id =>
           this.customersApi.getById(id).pipe(
             catchError(() => {
               this.loadingCustomer.set(false);
+              this.toast.error(this.i18n.instant('errors.notFound'));
               return EMPTY;
-            })
-          )
+            }),
+          ),
         ),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((c) => {
+      .subscribe(c => {
         this.customer.set(c);
         this.loadingCustomer.set(false);
       });
@@ -200,13 +207,13 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
       .getOnChainFacts(address)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (facts) => {
+        next: facts => {
           this.facts.set(facts);
           this.assessment.set(
             this.web3.assessRisk(
               { isContract: facts.isContract ?? undefined, txCount: facts.txCount ?? undefined },
-              signals
-            )
+              signals,
+            ),
           );
           this.screening.set(false);
         },
@@ -224,7 +231,7 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
       .getNetworkInfo()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (info) => this.network.set(info),
+        next: info => this.network.set(info),
         error: () => this.network.set(null),
       });
   }
@@ -236,15 +243,16 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
       this.operator.set(operator);
       this.walletCleanup?.();
       this.walletCleanup = this.web3.onWalletEvents({
-        onAccountsChanged: (accounts) => {
+        onAccountsChanged: accounts => {
           if (!accounts.length) {
             this.operator.set(null);
             this.signature.set(null);
             return;
           }
-          this.operator.update((o) => (o ? { ...o, address: accounts[0] } : o));
+          this.operator.update(o => this.operatorWithAddress(o, accounts[0]));
         },
-        onChainChanged: (chainIdHex) => this.operator.update((o) => (o ? { ...o, chainIdHex } : o)),
+        onChainChanged: chainIdHex =>
+          this.operator.update(o => this.operatorWithChain(o, chainIdHex)),
       });
     } catch (err) {
       this.walletError.set(this.walletErrorMessage(err));
@@ -276,13 +284,13 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
     this.toast.success(
       this.i18n.instant('web3.record.toast', {
         decision: this.i18n.instant(`web3.decision.${decision}`),
-      })
+      }),
     );
   }
 
   back(): void {
     const c = this.customer();
-    this.router.navigate(c ? ['/customers', c.id] : ['/customers']);
+    this.router.navigate(this.backRoute(c));
   }
 
   addressExplorerUrl(): string {
@@ -307,7 +315,34 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
   }
 
   signalColor(hit: boolean): BadgeColor {
-    return hit ? 'red' : 'green';
+    if (hit) return 'red';
+    return 'green';
+  }
+
+  private signalExplanationList(flagged: RiskSignal[]): string {
+    if (!flagged.length) return this.i18n.instant('web3.explanation.none');
+    return flagged.map(s => this.i18n.instant(`web3.signals.${s.key}`)).join(', ');
+  }
+
+  private operatorWithAddress(
+    operator: OperatorWallet | null,
+    address: string,
+  ): OperatorWallet | null {
+    if (!operator) return operator;
+    return { ...operator, address };
+  }
+
+  private operatorWithChain(
+    operator: OperatorWallet | null,
+    chainIdHex: string,
+  ): OperatorWallet | null {
+    if (!operator) return operator;
+    return { ...operator, chainIdHex };
+  }
+
+  private backRoute(customer: Customer | null): string[] {
+    if (!customer) return ['/customers'];
+    return ['/customers', customer.id];
   }
 
   private walletErrorMessage(err: unknown): string {

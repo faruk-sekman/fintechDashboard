@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { UiBadgeComponent, UiBadgeColor } from '@shared/components/ui-badge/ui-badge.component';
@@ -9,7 +13,7 @@ import { getKycStatusBadgeColor } from '@shared/utils/kyc-status';
   standalone: true,
   imports: [CommonModule, UiBadgeComponent],
   templateUrl: './customer-status-badge.component.html',
-  styleUrl: './customer-status-badge.component.scss'
+  styleUrl: './customer-status-badge.component.scss',
 })
 export class CustomerStatusBadgeComponent {
   @Input() status: KycStatus | string = 'UNKNOWN';

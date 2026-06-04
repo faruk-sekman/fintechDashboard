@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { GlobalErrorHandler } from '@core/services/global-error-handler';
 

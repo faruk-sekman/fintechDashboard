@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TranslateService, type TranslationObject } from '@ngx-translate/core';
@@ -13,10 +17,10 @@ import enTranslations from '../assets/i18n/en.json';
   standalone: true,
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App implements OnInit {
-  constructor(private i18n: TranslateService) {
+  constructor(private readonly i18n: TranslateService) {
     registerLocaleData(localeTr);
     registerLocaleData(localeEn);
     this.i18n.setTranslation('tr', trTranslations as TranslationObject);
@@ -32,7 +36,8 @@ export class App implements OnInit {
     try {
       if (typeof localStorage === 'undefined') return null;
       const saved = localStorage.getItem('lang');
-      return saved === 'tr' || saved === 'en' ? saved : null;
+      if (saved === 'tr' || saved === 'en') return saved;
+      return null;
     } catch {
       return null;
     }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { Actions } from '@ngrx/effects';
@@ -8,17 +12,36 @@ import { TransactionsStore } from '@features/customers/state/transactions/transa
 import {
   loadTransactions,
   loadTransactionsFailure,
-  loadTransactionsSuccess
+  loadTransactionsSuccess,
 } from '@features/customers/state/transactions/transactions.actions';
-import { transactionsReducer, initialState } from '@features/customers/state/transactions/transactions.reducer';
-import { selectTransactionsData, selectTransactionsLoading, selectTransactionsTotal, selectTransactionsError } from '@features/customers/state/transactions/transactions.selectors';
+import {
+  transactionsReducer,
+  initialState,
+} from '@features/customers/state/transactions/transactions.reducer';
+import {
+  selectTransactionsData,
+  selectTransactionsLoading,
+  selectTransactionsTotal,
+  selectTransactionsError,
+} from '@features/customers/state/transactions/transactions.selectors';
 import { TransactionsApi } from '@core/api/transactions.api';
 
-const tx = { id: '1', amount: 10, currency: 'TRY', type: 'CREDIT', transferDirection: 'INCOMING', createdAt: '', description: '' } as any;
+const tx = {
+  id: '1',
+  amount: 10,
+  currency: 'TRY',
+  type: 'CREDIT',
+  transferDirection: 'INCOMING',
+  createdAt: '',
+  description: '',
+} as any;
 
 describe('Transactions state', () => {
   it('transactionsReducer handles load actions', () => {
-    const loading = transactionsReducer(initialState, loadTransactions({ customerId: '1', params: { page: 1 } }));
+    const loading = transactionsReducer(
+      initialState,
+      loadTransactions({ customerId: '1', params: { page: 1 } }),
+    );
     expect(loading.loading).toBe(true);
 
     const loaded = transactionsReducer(loading, loadTransactionsSuccess({ data: [tx], total: 1 }));
@@ -44,13 +67,15 @@ describe('Transactions state', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: Store, useValue: storeMock },
-        { provide: Actions, useValue: new Actions(actions$) }
-      ]
+        { provide: Actions, useValue: new Actions(actions$) },
+      ],
     });
 
     const store = TestBed.runInInjectionContext(() => new TransactionsStore());
     store.load('1', { page: 1 });
-    expect(storeMock.dispatch).toHaveBeenCalledWith(loadTransactions({ customerId: '1', params: { page: 1 } }));
+    expect(storeMock.dispatch).toHaveBeenCalledWith(
+      loadTransactions({ customerId: '1', params: { page: 1 } }),
+    );
   });
 
   it('TransactionsEffects emits success action', () => {
@@ -60,13 +85,13 @@ describe('Transactions state', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: Actions, useValue: new Actions(actions$) },
-        { provide: TransactionsApi, useValue: api }
-      ]
+        { provide: TransactionsApi, useValue: api },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new TransactionsEffects());
     const results: any[] = [];
-    const sub = effects.load$.subscribe((a) => results.push(a));
+    const sub = effects.load$.subscribe(a => results.push(a));
 
     actions$.next(loadTransactions({ customerId: '1', params: { page: 1 } }));
     expect(results[0].type).toBe(loadTransactionsSuccess.type);
@@ -81,13 +106,13 @@ describe('Transactions state', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: Actions, useValue: new Actions(actions$) },
-        { provide: TransactionsApi, useValue: api }
-      ]
+        { provide: TransactionsApi, useValue: api },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new TransactionsEffects());
     const results: any[] = [];
-    const sub = effects.load$.subscribe((a) => results.push(a));
+    const sub = effects.load$.subscribe(a => results.push(a));
 
     actions$.next(loadTransactions({ customerId: '1', params: { page: 1 } }));
     expect(results[0]).toEqual(loadTransactionsSuccess({ data: [], total: 0 }));
@@ -102,13 +127,13 @@ describe('Transactions state', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: Actions, useValue: new Actions(actions$) },
-        { provide: TransactionsApi, useValue: api }
-      ]
+        { provide: TransactionsApi, useValue: api },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new TransactionsEffects());
     const results: any[] = [];
-    const sub = effects.load$.subscribe((a) => results.push(a));
+    const sub = effects.load$.subscribe(a => results.push(a));
 
     actions$.next(loadTransactions({ customerId: '1', params: { page: 1 } }));
     expect(results[0].type).toBe(loadTransactionsFailure.type);

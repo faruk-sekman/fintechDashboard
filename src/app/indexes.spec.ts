@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect } from 'vitest';
 import * as core from '@core/index';
 import * as shared from '@shared/index';

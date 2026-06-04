@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
@@ -9,7 +13,7 @@ import { PageEvent } from '@shared/components/ui-table/ui-table.types';
   standalone: true,
   imports: [CommonModule, TranslateModule, UiButtonComponent],
   templateUrl: './ui-pagination.component.html',
-  styleUrl: './ui-pagination.component.scss'
+  styleUrl: './ui-pagination.component.scss',
 })
 export class UiPaginationComponent {
   @Input() page = 1;

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 export * from '@core/api/customers.api';
 export * from '@core/api/transactions.api';
 export * from '@core/api/wallets.api';

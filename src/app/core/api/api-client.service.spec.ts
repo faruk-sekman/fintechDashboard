@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { lastValueFrom, of, throwError } from 'rxjs';
 import { ApiClientService } from '@core/api/api-client.service';
@@ -18,10 +22,18 @@ describe('ApiClientService', () => {
 
     api.get('/customers', { page: 1, search: 'x' }).subscribe();
 
-    const [url, options] = http.get.mock.calls[0];
-    expect(url).toBe(`${environment.apiBaseUrl}/customers`);
-    expect(options.params.get('page')).toBe('1');
-    expect(options.params.get('search')).toBe('x');
+    expect(http.get).toHaveBeenCalledWith(
+      `${environment.apiBaseUrl}/customers`,
+      expect.objectContaining({
+        params: expect.any(Object),
+      }),
+    );
+    const calls = http.get.mock.calls as any[];
+    if (calls.length > 0 && calls[0].length >= 2) {
+      const options = calls[0][1];
+      expect(options.params.get('page')).toBe('1');
+      expect(options.params.get('search')).toBe('x');
+    }
   });
 
   it('accepts path without leading slash', () => {
@@ -30,8 +42,7 @@ describe('ApiClientService', () => {
 
     api.get('wallets', {}).subscribe();
 
-    const [url] = http.get.mock.calls[0];
-    expect(url).toBe(`${environment.apiBaseUrl}/wallets`);
+    expect(http.get).toHaveBeenCalledWith(`${environment.apiBaseUrl}/wallets`, expect.any(Object));
   });
 
   it('calls post/put/patch/delete with correct urls', () => {

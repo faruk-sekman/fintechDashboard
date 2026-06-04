@@ -345,7 +345,7 @@ npx vitest --run                  # run only
 npx vitest --run --coverage       # coverage only
 ```
 
-Current: **~90% lines** across **31 spec files**. CI gate (fail < 80% lines):
+Current: **~90% lines** across **32 spec files**. CI gate (fail < 80% lines):
 
 ```bash
 node -e "const s=require('./coverage/coverage-summary.json');const p=s.total.lines.pct;console.log('Lines:',p+'%');process.exit(p>=80?0:1);"

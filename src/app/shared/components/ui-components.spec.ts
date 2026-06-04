@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { FormControl } from '@angular/forms';
 import { SimpleChange } from '@angular/core';
@@ -14,7 +18,9 @@ import { UiSkeletonComponent } from '@shared/components/ui-skeleton/ui-skeleton.
 
 class TranslateMock {
   currentLang = 'en';
-  instant(key: string) { return key; }
+  instant(key: string) {
+    return key;
+  }
 }
 
 describe('Shared UI components', () => {
@@ -50,7 +56,10 @@ describe('Shared UI components', () => {
     const control = new FormControl('123456');
     input.control = control;
     input.mask = '###-###';
-    input.ngOnChanges({ control: new SimpleChange(null, control, true), mask: new SimpleChange(null, '###-###', true) });
+    input.ngOnChanges({
+      control: new SimpleChange(null, control, true),
+      mask: new SimpleChange(null, '###-###', true),
+    });
 
     expect(control.value).toBe('123-456');
 
@@ -69,7 +78,10 @@ describe('Shared UI components', () => {
     input.control = control;
     input.mask = '###-###';
     const setSpy = vi.spyOn(control, 'setValue');
-    input.ngOnChanges({ control: new SimpleChange(null, control, true), mask: new SimpleChange(null, '###-###', true) });
+    input.ngOnChanges({
+      control: new SimpleChange(null, control, true),
+      mask: new SimpleChange(null, '###-###', true),
+    });
     expect(setSpy).not.toHaveBeenCalled();
 
     control.setValue('123-456');
@@ -84,7 +96,10 @@ describe('Shared UI components', () => {
     input.control = new FormControl('123');
     input.mask = '###-###';
     input.type = 'number';
-    input.ngOnChanges({ control: new SimpleChange(null, input.control, true), mask: new SimpleChange(null, '###-###', true) });
+    input.ngOnChanges({
+      control: new SimpleChange(null, input.control, true),
+      mask: new SimpleChange(null, '###-###', true),
+    });
     expect(input.control.value).toBe('123');
   });
 
@@ -188,16 +203,19 @@ describe('Shared UI components', () => {
     const row = { amount: 10, createdAt: '2024-01-01T00:00:00Z', currency: 'USD', status: 'OK' };
     const colCurrency = { key: 'amount', type: 'currency' } as any;
     const colDate = { key: 'createdAt', type: 'date' } as any;
-    const colBadge = { key: 'status', badgeColor: () => 'green', badgeIcon: () => 'ri-ok-line', badgeClass: () => 'x', badgeIconPosition: () => 'right', badgeIconClass: () => 'y' } as any;
+    const colBadge = {
+      key: 'status',
+      badgeColor: () => 'green',
+      badgeIcon: () => 'ri-ok-line',
+    } as any;
 
     expect(table.displayCell(colCurrency, row)).toContain('$');
     expect(table.displayCell(colDate, row)).toContain('2024');
     expect(table.badgeColor(colBadge, row)).toBe('green');
     expect(table.badgeIcon(colBadge, row)).toBe('ri-ok-line');
-    expect(table.badgeClass(colBadge, row)).toBe('x');
-    expect(table.badgeIconPosition(colBadge, row)).toBe('right');
-    expect(table.badgeIconClass(colBadge, row)).toBe('y');
     expect(table.toggleOn({ key: 'status' } as any, row)).toBe(true);
+    expect(table.trackRow({ id: 'abc' } as any, 3)).toBe('abc');
+    expect(table.trackRow({} as any, 3)).toBe(3);
 
     const emit = vi.fn();
     table.pageChange.subscribe(emit);
@@ -214,16 +232,10 @@ describe('Shared UI components', () => {
     const colStatic = {
       key: 'value',
       badgeColor: 'red',
-      badgeClass: 'cls',
       badgeIcon: 'ri-check',
-      badgeIconPosition: 'right',
-      badgeIconClass: 'ic'
     } as any;
     expect(table.badgeColor(colStatic, row)).toBe('red');
-    expect(table.badgeClass(colStatic, row)).toBe('cls');
     expect(table.badgeIcon(colStatic, row)).toBe('ri-check');
-    expect(table.badgeIconPosition(colStatic, row)).toBe('right');
-    expect(table.badgeIconClass(colStatic, row)).toBe('ic');
   });
 
   it('UiTableComponent defaults badge values when undefined', () => {
@@ -231,10 +243,7 @@ describe('Shared UI components', () => {
     const row = { status: null };
     const col = { key: 'status' } as any;
     expect(table.badgeColor(col, row)).toBe('gray');
-    expect(table.badgeClass(col, row)).toBeNull();
     expect(table.badgeIcon(col, row)).toBeNull();
-    expect(table.badgeIconPosition(col, row)).toBe('left');
-    expect(table.badgeIconClass(col, row)).toBeNull();
   });
 
   it('UiTableComponent handles null and invalid values', () => {
@@ -387,7 +396,7 @@ describe('Shared UI components', () => {
     const form = new UiFormComponent(new TranslateMock() as any);
     form.fields = [
       { name: 'address.city', labelKey: 'city', type: 'text' } as any,
-      { name: 'address.country', labelKey: 'country', type: 'text' } as any
+      { name: 'address.country', labelKey: 'country', type: 'text' } as any,
     ];
     form.ngOnChanges({ fields: new SimpleChange(null, form.fields, true) });
 
@@ -411,7 +420,7 @@ describe('Shared UI components', () => {
     expect(form.control('name').value).toBeNull();
   });
 
-  it('UiFormComponent returns default invalid error key', () => {
+  it('UiFormComponent maps any validator key to validation.<key> by convention', () => {
     const form = new UiFormComponent(new TranslateMock() as any);
     form.fields = [{ name: 'name', labelKey: 'name', type: 'text' } as any];
     form.ngOnChanges({ fields: new SimpleChange(null, form.fields, true) });
@@ -419,7 +428,7 @@ describe('Shared UI components', () => {
     const control = form.control('name');
     control.setErrors({ custom: true });
     control.markAsDirty();
-    expect(form.displayError('name')?.key).toBe('validation.invalid');
+    expect(form.displayError('name')?.key).toBe('validation.custom');
   });
 
   it('UiFormComponent cleans up on destroy', () => {
@@ -436,7 +445,7 @@ describe('Shared UI components', () => {
     expect(skeleton.styles).toEqual({
       '--skeleton-w': '10px',
       '--skeleton-h': '4px',
-      '--skeleton-r': '2px'
+      '--skeleton-r': '2px',
     });
   });
 
@@ -483,7 +492,7 @@ describe('Shared UI components', () => {
       { errors: { minAge: { requiredAge: 18 } }, key: 'validation.minAge' },
       { errors: { maxAge: { requiredAge: 65 } }, key: 'validation.maxAge' },
       { errors: { limitMismatch: true }, key: 'validation.limitMismatch' },
-      { errors: { api: 'custom.error' }, key: 'custom.error' }
+      { errors: { api: 'custom.error' }, key: 'custom.error' },
     ];
 
     for (const c of cases) {

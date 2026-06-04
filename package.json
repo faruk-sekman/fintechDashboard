@@ -10,11 +10,15 @@
     "start:stage": "ng serve --configuration stage",
     "build:stage": "ng build --configuration stage",
     "lint:styles": "stylelint \"src/**/*.scss\"",
-    "lint:styles:fix": "npm run lint:styles -- --fix"
+    "lint:styles:fix": "npm run lint:styles -- --fix",
+    "format": "prettier --write \"src/**/*.{ts,html,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,json}\""
   },
   "prettier": {
     "printWidth": 100,
     "singleQuote": true,
+    "trailingComma": "all",
+    "arrowParens": "avoid",
     "overrides": [
       {
         "files": "*.html",
@@ -49,14 +53,15 @@
     "@angular/build": "^21.1.2",
     "@angular/cli": "^21.1.2",
     "@angular/compiler-cli": "^21.1.0",
+    "@vitest/coverage-v8": "^4.0.8",
     "autoprefixer": "^10.4.24",
     "jsdom": "^27.1.0",
     "postcss": "^8.5.6",
+    "prettier": "^3.8.3",
     "stylelint": "^16.14.1",
     "stylelint-config-standard-scss": "^14.0.0",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8",
-    "@vitest/coverage-v8": "^4.0.8"
+    "vitest": "^4.0.8"
   }
 }

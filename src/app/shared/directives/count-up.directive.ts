@@ -1,12 +1,8 @@
-import {
-  Directive,
-  ElementRef,
-  Input,
-  NgZone,
-  OnChanges,
-  OnDestroy,
-  inject
-} from '@angular/core';
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
+import { Directive, ElementRef, Input, NgZone, OnChanges, OnDestroy, inject } from '@angular/core';
 
 /**
  * Animates the host element's text from its previously displayed value up
@@ -23,7 +19,7 @@ import {
  */
 @Directive({
   selector: '[appCountUp]',
-  standalone: true
+  standalone: true,
 })
 export class CountUpDirective implements OnChanges, OnDestroy {
   @Input() appCountUp: number | null = 0;
@@ -96,10 +92,13 @@ export class CountUpDirective implements OnChanges, OnDestroy {
   }
 
   private render(value: number): void {
-    const rounded = this.countUpDecimals > 0 ? value : Math.round(value);
+    let rounded = value;
+    if (this.countUpDecimals <= 0) {
+      rounded = Math.round(value);
+    }
     const formatted = rounded.toLocaleString(undefined, {
       minimumFractionDigits: this.countUpDecimals,
-      maximumFractionDigits: this.countUpDecimals
+      maximumFractionDigits: this.countUpDecimals,
     });
     this.host.textContent = `${this.countUpPrefix}${formatted}${this.countUpSuffix}`;
   }
@@ -112,7 +111,8 @@ export class CountUpDirective implements OnChanges, OnDestroy {
   }
 
   private easeOutExpo(t: number): number {
-    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    if (t === 1) return 1;
+    return 1 - Math.pow(2, -10 * t);
   }
 
   private prefersReducedMotion(): boolean {

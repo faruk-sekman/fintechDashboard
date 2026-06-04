@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 export type TransactionType = 'DEBIT' | 'CREDIT';
 export type TransferDirection = 'INCOMING' | 'OUTGOING';
 

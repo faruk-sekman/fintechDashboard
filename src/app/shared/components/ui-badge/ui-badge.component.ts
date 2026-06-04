@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
@@ -32,7 +36,7 @@ const COLOR_CLASSES: Record<Exclude<UiBadgeColor, 'custom'>, string> = {
   teal: 'ui-badge--teal',
   cyan: 'ui-badge--cyan',
   fuchsia: 'ui-badge--fuchsia',
-  zinc: 'ui-badge--zinc'
+  zinc: 'ui-badge--zinc',
 };
 //""
 @Component({
@@ -41,7 +45,7 @@ const COLOR_CLASSES: Record<Exclude<UiBadgeColor, 'custom'>, string> = {
   imports: [CommonModule],
   templateUrl: './ui-badge.component.html',
   styleUrl: './ui-badge.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiBadgeComponent {
   @Input() text: string | null = null;

@@ -1,5 +1,14 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect } from 'vitest';
-import { getKycStatusBadgeColor, KYC_STATUS_FILTER_OPTIONS, KYC_STATUS_OPTIONS, KYC_STATUS_ORDER } from '@shared/utils/kyc-status';
+import {
+  getKycStatusBadgeColor,
+  KYC_STATUS_FILTER_OPTIONS,
+  KYC_STATUS_OPTIONS,
+  KYC_STATUS_ORDER,
+} from '@shared/utils/kyc-status';
 
 describe('kyc-status utils', () => {
   it('maps known statuses to badge colors', () => {
@@ -14,7 +23,7 @@ describe('kyc-status utils', () => {
   });
 
   it('builds filter options with all option first', () => {
-    expect(KYC_STATUS_OPTIONS.map((o) => o.value)).toEqual(KYC_STATUS_ORDER);
+    expect(KYC_STATUS_OPTIONS.map(o => o.value)).toEqual(KYC_STATUS_ORDER);
     expect(KYC_STATUS_FILTER_OPTIONS[0].value).toBe('');
     expect(KYC_STATUS_FILTER_OPTIONS.length).toBe(KYC_STATUS_ORDER.length + 1);
   });

@@ -1,15 +1,29 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, ofType } from '@ngrx/effects';
 
 import { ListCustomersParams } from '@core/api/customers.api';
-import { deleteCustomer, deleteCustomerSuccess, loadCustomers } from '@features/customers/state/customers/customers.actions';
-import { selectCustomersData, selectCustomersDeleting, selectCustomersDeletingId, selectCustomersLoading, selectCustomersTotal } from '@features/customers/state/customers/customers.selectors';
+import {
+  deleteCustomer,
+  deleteCustomerSuccess,
+  loadCustomers,
+} from '@features/customers/state/customers/customers.actions';
+import {
+  selectCustomersData,
+  selectCustomersDeleting,
+  selectCustomersDeletingId,
+  selectCustomersLoading,
+  selectCustomersTotal,
+} from '@features/customers/state/customers/customers.selectors';
 
 @Injectable({ providedIn: 'root' })
 export class CustomersStore {
-  private store = inject(Store);
-  private actions$ = inject(Actions);
+  private readonly store = inject(Store);
+  private readonly actions$ = inject(Actions);
 
   readonly data$ = this.store.select(selectCustomersData);
   readonly total$ = this.store.select(selectCustomersTotal);

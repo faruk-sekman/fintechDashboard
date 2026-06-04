@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { HeaderComponent } from './header.component';
@@ -15,11 +19,13 @@ describe('HeaderComponent', () => {
       providers: [
         { provide: TranslateService, useValue: i18n },
         { provide: LoadingService, useValue: loading },
-        { provide: ThemeService, useValue: theme }
-      ]
+        { provide: ThemeService, useValue: theme },
+      ],
     });
 
-    const component = TestBed.runInInjectionContext(() => new HeaderComponent(i18n as any, loading as any));
+    const component = TestBed.runInInjectionContext(
+      () => new HeaderComponent(i18n as any, loading as any),
+    );
     component.switchLang('tr');
     expect(i18n.use).toHaveBeenCalledWith('tr');
     expect(component.currentLang()).toBe('tr');
@@ -37,11 +43,13 @@ describe('HeaderComponent', () => {
       providers: [
         { provide: TranslateService, useValue: i18n },
         { provide: LoadingService, useValue: loading },
-        { provide: ThemeService, useValue: theme }
-      ]
+        { provide: ThemeService, useValue: theme },
+      ],
     });
 
-    const component = TestBed.runInInjectionContext(() => new HeaderComponent(i18n as any, loading as any));
+    const component = TestBed.runInInjectionContext(
+      () => new HeaderComponent(i18n as any, loading as any),
+    );
     component.setTheme('dark');
     expect(theme.setTheme).toHaveBeenCalledWith('dark');
   });

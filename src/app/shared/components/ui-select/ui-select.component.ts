@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -10,7 +14,7 @@ import { SelectOption } from '@shared/components/ui-form/ui-form.types';
   imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './ui-select.component.html',
   styleUrl: './ui-select.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiSelectComponent {
   @Input({ required: true }) control!: FormControl;

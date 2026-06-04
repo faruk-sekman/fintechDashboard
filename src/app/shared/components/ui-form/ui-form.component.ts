@@ -1,5 +1,19 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+  ViewEncapsulation,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, merge } from 'rxjs';
@@ -34,12 +48,12 @@ function ensureGroup(root: FormGroup, path: string[]): FormGroup {
     UiInputComponent,
     UiSelectComponent,
     UiCheckboxComponent,
-    UiButtonComponent
+    UiButtonComponent,
   ],
   templateUrl: './ui-form.component.html',
   styleUrl: './ui-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class UiFormComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) fields: ReadonlyArray<FieldConfig> = [];
@@ -56,10 +70,10 @@ export class UiFormComponent implements OnChanges, OnDestroy {
   form = new FormGroup({});
   hasChanges = false;
   private initialSnapshot: unknown = null;
-  private destroy$ = new Subject<void>();
-  private formChanges$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
+  private readonly formChanges$ = new Subject<void>();
 
-  constructor(private i18n: TranslateService) {}
+  constructor(private readonly i18n: TranslateService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['fields']) {
@@ -121,13 +135,18 @@ export class UiFormComponent implements OnChanges, OnDestroy {
 
   private normalizeValue(value: unknown): unknown {
     if (Array.isArray(value)) {
-      return value.map((item) => this.normalizeValue(item));
+      return value.map(item => this.normalizeValue(item));
     }
     if (value && typeof value === 'object') {
-      return Object.keys(value as Record<string, unknown>).reduce((acc, key) => {
-        (acc as Record<string, unknown>)[key] = this.normalizeValue((value as Record<string, unknown>)[key]);
-        return acc;
-      }, {} as Record<string, unknown>);
+      return Object.keys(value as Record<string, unknown>).reduce(
+        (acc, key) => {
+          (acc as Record<string, unknown>)[key] = this.normalizeValue(
+            (value as Record<string, unknown>)[key],
+          );
+          return acc;
+        },
+        {} as Record<string, unknown>,
+      );
     }
     return value;
   }
@@ -150,7 +169,10 @@ export class UiFormComponent implements OnChanges, OnDestroy {
       if (aKeys.length !== bKeys.length) return false;
       for (const key of aKeys) {
         if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
-        if (!this.deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])) return false;
+        if (
+          !this.deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])
+        )
+          return false;
       }
       return true;
     }
@@ -169,7 +191,8 @@ export class UiFormComponent implements OnChanges, OnDestroy {
     const c = this.form.get(path);
     if (!c || c.disabled || c.pending) return null;
     if (!c.dirty) return null;
-    return c.invalid ? 'invalid' : 'valid';
+    if (c.invalid) return 'invalid';
+    return 'valid';
   }
 
   showStatus(path: string): boolean {
@@ -186,7 +209,7 @@ export class UiFormComponent implements OnChanges, OnDestroy {
       'ui-form__control': true,
       'ui-form__control--invalid': state === 'invalid',
       'ui-form__control--valid': state === 'valid',
-      ...this.classValueToObject(extra)
+      ...this.classValueToObject(extra),
     };
   }
 
@@ -198,39 +221,37 @@ export class UiFormComponent implements OnChanges, OnDestroy {
   }
 
   dateInputLang(): string {
-    return this.i18n.currentLang === 'tr' ? 'tr-TR' : 'en-US';
+    if (this.i18n.currentLang === 'tr') return 'tr-TR';
+    return 'en-US';
   }
 
   getError(path: string): { key: string; params?: Record<string, unknown> } | null {
     const c = this.form.get(path);
     if (!c || !c.errors) return null;
-    if (c.errors['required']) return { key: 'validation.required' };
-    if (c.errors['multipleSpaces']) return { key: 'validation.multipleSpaces' };
-    if (c.errors['email']) return { key: 'validation.email' };
-    if (c.errors['nationalIdNumeric']) return { key: 'validation.nationalIdNumeric' };
-    if (c.errors['nationalIdLength']) return { key: 'validation.nationalIdLength' };
-    if (c.errors['nationalIdStartsWithZero']) return { key: 'validation.nationalIdStartsWithZero' };
-    if (c.errors['nationalIdChecksum']) return { key: 'validation.nationalIdChecksum' };
-    if (c.errors['min']) return { key: 'validation.min', params: { min: c.errors['min'].min } };
-    if (c.errors['max']) return { key: 'validation.max', params: { max: c.errors['max'].max } };
-    if (c.errors['minlength']) {
-      return { key: 'validation.minLength', params: { min: c.errors['minlength'].requiredLength } };
+    const errors = c.errors;
+
+    // Built-in / cross-cutting validators that carry params or need a remapped key.
+    if (errors['required']) return { key: 'validation.required' };
+    if (errors['min']) return { key: 'validation.min', params: { min: errors['min'].min } };
+    if (errors['max']) return { key: 'validation.max', params: { max: errors['max'].max } };
+    if (errors['minlength']) {
+      return { key: 'validation.minLength', params: { min: errors['minlength'].requiredLength } };
     }
-    if (c.errors['maxlength']) {
-      return { key: 'validation.maxLength', params: { max: c.errors['maxlength'].requiredLength } };
+    if (errors['maxlength']) {
+      return { key: 'validation.maxLength', params: { max: errors['maxlength'].requiredLength } };
     }
-    if (c.errors['surnameRequired']) return { key: 'validation.surnameRequired' };
-    if (c.errors['phoneInvalid']) return { key: 'validation.phoneInvalid' };
-    if (c.errors['walletNumberInvalid']) return { key: 'validation.walletNumberInvalid' };
-    if (c.errors['nameInvalid']) return { key: 'validation.nameInvalid' };
-    if (c.errors['unsafeChars']) return { key: 'validation.unsafeChars' };
-    if (c.errors['dateInvalid']) return { key: 'validation.dateInvalid' };
-    if (c.errors['dateInFuture']) return { key: 'validation.dateInFuture' };
-    if (c.errors['minAge']) return { key: 'validation.minAge', params: { min: c.errors['minAge'].requiredAge } };
-    if (c.errors['maxAge']) return { key: 'validation.maxAge', params: { max: c.errors['maxAge'].requiredAge } };
-    if (c.errors['limitMismatch']) return { key: 'validation.limitMismatch' };
-    if (c.errors['api']) return { key: String(c.errors['api']) };
-    return { key: 'validation.invalid' };
+    if (errors['minAge']) {
+      return { key: 'validation.minAge', params: { min: errors['minAge'].requiredAge } };
+    }
+    if (errors['maxAge']) {
+      return { key: 'validation.maxAge', params: { max: errors['maxAge'].requiredAge } };
+    }
+    if (errors['api']) return { key: String(errors['api']) };
+
+    // Any other validator maps to `validation.<errorKey>` by convention, so this
+    // shared form stays decoupled from app-specific validators (ISP).
+    const firstKey = Object.keys(errors)[0];
+    return { key: firstKey ? `validation.${firstKey}` : 'validation.invalid' };
   }
 
   displayError(path: string): { key: string; params?: Record<string, unknown> } | null {
@@ -248,22 +269,34 @@ export class UiFormComponent implements OnChanges, OnDestroy {
   private classValueToObject(value?: ClassValue | null): { [csClass: string]: boolean } {
     if (!value) return {};
     if (typeof value === 'string') {
-      return value.split(/\s+/).filter(Boolean).reduce((acc, cls) => {
-        acc[cls] = true;
-        return acc;
-      }, {} as Record<string, boolean>);
+      return value
+        .split(/\s+/)
+        .filter(Boolean)
+        .reduce(
+          (acc, cls) => {
+            acc[cls] = true;
+            return acc;
+          },
+          {} as Record<string, boolean>,
+        );
     }
     if (Array.isArray(value)) {
-      return value.reduce((acc, item) => {
-        if (typeof item === 'string') acc[item] = true;
-        return acc;
-      }, {} as Record<string, boolean>);
+      return value.reduce(
+        (acc, item) => {
+          if (typeof item === 'string') acc[item] = true;
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
     }
     if (value instanceof Set) {
-      return Array.from(value).reduce((acc, cls) => {
-        acc[cls] = true;
-        return acc;
-      }, {} as Record<string, boolean>);
+      return Array.from(value).reduce(
+        (acc, cls) => {
+          acc[cls] = true;
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
     }
     return { ...value };
   }

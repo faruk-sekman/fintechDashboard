@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, forkJoin, of } from 'rxjs';
@@ -105,7 +109,7 @@ export class Web3Service {
   private readonly rpcUrl = environment.web3.rpcUrl;
 
   /** HttpClient-only ctor so the service is trivially testable via `new`. */
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   /* ── Pure helpers ──────────────────────────────────────────────────────── */
 
@@ -131,16 +135,16 @@ export class Web3Service {
     } catch {
       return '0';
     }
+    const negative = value < 0n;
+    const abs = negative ? -value : value;
+    const sign = negative ? '-' : '';
     const base = 10n ** BigInt(decimals);
-    const whole = value / base;
-    const frac = value % base;
-    if (frac === 0n) return whole.toString();
-    const fracStr = frac
-      .toString()
-      .padStart(decimals, '0')
-      .slice(0, precision)
-      .replace(/0+$/, '');
-    return fracStr ? `${whole.toString()}.${fracStr}` : whole.toString();
+    const whole = abs / base;
+    const frac = abs % base;
+    if (frac === 0n) return `${sign}${whole.toString()}`;
+    const fracStr = frac.toString().padStart(decimals, '0').slice(0, precision).replace(/0+$/, '');
+    if (!fracStr) return `${sign}${whole.toString()}`;
+    return `${sign}${whole.toString()}.${fracStr}`;
   }
 
   /** hex quantity -> number. Safe for counts/blocks/chainIds. '' / '0x' -> 0. */
@@ -247,7 +251,7 @@ export class Web3Service {
         // Retry transient network failures (rate-limit, dropped/cancelled requests).
         // Logical JSON-RPC errors are thrown in map() below — AFTER retry — so they are not retried.
         retry({ count: 2, delay: 600 }),
-        map((res) => {
+        map(res => {
           // JSON-RPC errors arrive as HTTP 200 -> must be checked here.
           if (res.error) {
             throw new Error(`RPC ${method} failed: ${res.error.message}`);
@@ -256,7 +260,7 @@ export class Web3Service {
             throw new Error(`RPC ${method} returned no result`);
           }
           return res.result;
-        })
+        }),
       );
   }
 
@@ -302,13 +306,28 @@ export class Web3Service {
         return {
           address,
           balanceWei: balance,
-          balanceEth: balance !== null ? this.formatUnits(balance, 18) : null,
-          txCount: txCount !== null ? this.hexToNumber(txCount) : null,
+          balanceEth: this.formatNullableUnits(balance, 18),
+          txCount: this.hexToNullableNumber(txCount),
           // EOA returns '0x'; a contract returns its bytecode.
-          isContract: code !== null ? !!code && code !== '0x' : null,
+          isContract: this.isNullableContractCode(code),
         };
-      })
+      }),
     );
+  }
+
+  private formatNullableUnits(value: string | null, decimals: number): string | null {
+    if (value === null) return null;
+    return this.formatUnits(value, decimals);
+  }
+
+  private hexToNullableNumber(value: string | null): number | null {
+    if (value === null) return null;
+    return this.hexToNumber(value);
+  }
+
+  private isNullableContractCode(code: string | null): boolean | null {
+    if (code === null) return null;
+    return !!code && code !== '0x';
   }
 
   /** REAL: live network snapshot. */
@@ -324,7 +343,7 @@ export class Web3Service {
         blockNumber: this.hexToNumber(blockNumber),
         gasPriceWei: gasPrice,
         gasPriceGwei: this.formatUnits(gasPrice, 9, 2),
-      }))
+      })),
     );
   }
 
@@ -377,7 +396,7 @@ export class Web3Service {
    * (EOA vs contract, activity) but does NOT relax the policy.
    */
   assessRisk(account: RiskAccountContext, signals: RiskSignal[]): RiskAssessment {
-    const has = (key: RiskSignalKey): boolean => signals.some((s) => s.key === key && s.hit);
+    const has = (key: RiskSignalKey): boolean => signals.some(s => s.key === key && s.hit);
     let decision: RiskDecision;
     let level: RiskLevel;
     if (has('sanctionsHit')) {

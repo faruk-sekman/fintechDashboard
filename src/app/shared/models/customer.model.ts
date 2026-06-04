@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 export type KycStatus = 'UNKNOWN' | 'UNVERIFIED' | 'VERIFIED' | 'CONTRACTED';
 
 export interface Address {

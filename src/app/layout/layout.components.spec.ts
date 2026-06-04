@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
@@ -20,17 +24,20 @@ describe('Layout components', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: ThemeService, useValue: { theme: signal<'light' | 'dark'>('light'), setTheme: vi.fn() } },
+        {
+          provide: ThemeService,
+          useValue: { theme: signal<'light' | 'dark'>('light'), setTheme: vi.fn() },
+        },
         { provide: LoadingService, useValue: { loading$: of(false) } },
-        { provide: TranslateService, useClass: TranslateMock }
-      ]
+        { provide: TranslateService, useClass: TranslateMock },
+      ],
     });
   });
 
   it('HeaderComponent switches language and theme', () => {
     const translate = TestBed.inject(TranslateService) as any as TranslateMock;
     const component = TestBed.runInInjectionContext(
-      () => new HeaderComponent(translate as any, TestBed.inject(LoadingService))
+      () => new HeaderComponent(translate as any, TestBed.inject(LoadingService)),
     );
 
     component.switchLang('tr');

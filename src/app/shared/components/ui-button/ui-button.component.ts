@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
@@ -7,7 +11,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   imports: [CommonModule],
   templateUrl: './ui-button.component.html',
   styleUrl: './ui-button.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiButtonComponent {
   @Input() type: 'button' | 'submit' | 'reset' = 'button';

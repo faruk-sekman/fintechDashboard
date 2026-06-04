@@ -1,6 +1,17 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { ValidatorFn } from '@angular/forms';
 
-export type FieldType = 'text' | 'email' | 'number' | 'date' | 'datetime-local' | 'select' | 'checkbox';
+export type FieldType =
+  | 'text'
+  | 'email'
+  | 'number'
+  | 'date'
+  | 'datetime-local'
+  | 'select'
+  | 'checkbox';
 
 export interface SelectOption {
   labelKey: string;
@@ -10,7 +21,7 @@ export interface SelectOption {
 export type ClassValue = string | string[] | Set<string> | { [csClass: string]: any };
 
 export interface FieldConfig {
-  name: string; 
+  name: string;
   labelKey: string;
   type: FieldType;
   placeholderKey?: string;

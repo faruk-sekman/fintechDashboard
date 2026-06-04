@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { Actions } from '@ngrx/effects';
@@ -11,9 +15,12 @@ import {
   deleteCustomerSuccess,
   loadCustomers,
   loadCustomersFailure,
-  loadCustomersSuccess
+  loadCustomersSuccess,
 } from '@features/customers/state/customers/customers.actions';
-import { customersReducer, initialState } from '@features/customers/state/customers/customers.reducer';
+import {
+  customersReducer,
+  initialState,
+} from '@features/customers/state/customers/customers.reducer';
 import {
   selectCustomersData,
   selectCustomersDeleting,
@@ -21,13 +28,26 @@ import {
   selectCustomersLoading,
   selectCustomersTotal,
   selectCustomersError,
-  selectCustomersDeleteError
+  selectCustomersDeleteError,
 } from '@features/customers/state/customers/customers.selectors';
 import { CustomersApi } from '@core/api/customers.api';
 import { ToastService } from '@core/services/toast.service';
 import { TranslateService } from '@ngx-translate/core';
 
-const customer = { id: '1', name: 'A', email: 'a@b.com', phone: '1', walletNumber: 'w', nationalId: 1, dateOfBirth: '2000-01-01', address: { country: '', city: '', postalCode: '', line1: '' }, kycStatus: 'UNKNOWN', isActive: true, createdAt: '', updatedAt: '' } as any;
+const customer = {
+  id: '1',
+  name: 'A',
+  email: 'a@b.com',
+  phone: '1',
+  walletNumber: 'w',
+  nationalId: 1,
+  dateOfBirth: '2000-01-01',
+  address: { country: '', city: '', postalCode: '', line1: '' },
+  kycStatus: 'UNKNOWN',
+  isActive: true,
+  createdAt: '',
+  updatedAt: '',
+} as any;
 
 describe('Customers state', () => {
   it('customersReducer handles load and delete actions', () => {
@@ -48,7 +68,10 @@ describe('Customers state', () => {
     const failed = customersReducer(loaded, loadCustomersFailure({ error: 'x' }));
     expect(failed.error).toBe('x');
 
-    const deleteFailed = customersReducer(deleting, deleteCustomerFailure({ id: '1', error: 'bad' }));
+    const deleteFailed = customersReducer(
+      deleting,
+      deleteCustomerFailure({ id: '1', error: 'bad' }),
+    );
     expect(deleteFailed.deleteError).toBe('bad');
   });
 
@@ -60,7 +83,14 @@ describe('Customers state', () => {
   });
 
   it('selectors project state', () => {
-    const state = { ...initialState, data: [customer], total: 2, loading: true, deleting: true, deletingId: '1' };
+    const state = {
+      ...initialState,
+      data: [customer],
+      total: 2,
+      loading: true,
+      deleting: true,
+      deletingId: '1',
+    };
     expect(selectCustomersData.projector(state)).toEqual([customer]);
     expect(selectCustomersTotal.projector(state)).toBe(2);
     expect(selectCustomersLoading.projector(state)).toBe(true);
@@ -77,8 +107,8 @@ describe('Customers state', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: Store, useValue: storeMock },
-        { provide: Actions, useValue: new Actions(actions$) }
-      ]
+        { provide: Actions, useValue: new Actions(actions$) },
+      ],
     });
 
     const store = TestBed.runInInjectionContext(() => new CustomersStore());
@@ -91,7 +121,10 @@ describe('Customers state', () => {
 
   it('CustomersEffects emits success actions', () => {
     const actions$ = new Subject<any>();
-    const api = { list: vi.fn(() => of({ data: [customer], total: 1 })), delete: vi.fn(() => of({})) };
+    const api = {
+      list: vi.fn(() => of({ data: [customer], total: 1 })),
+      delete: vi.fn(() => of({})),
+    };
     const toast = { success: vi.fn() };
     const i18n = { instant: (k: string) => k };
 
@@ -100,19 +133,19 @@ describe('Customers state', () => {
         { provide: Actions, useValue: new Actions(actions$) },
         { provide: CustomersApi, useValue: api },
         { provide: ToastService, useValue: toast },
-        { provide: TranslateService, useValue: i18n }
-      ]
+        { provide: TranslateService, useValue: i18n },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new CustomersEffects());
     const results: any[] = [];
-    const sub = effects.load$.subscribe((a) => results.push(a));
+    const sub = effects.load$.subscribe(a => results.push(a));
 
     actions$.next(loadCustomers({ params: { page: 1 } }));
     expect(results[0].type).toBe(loadCustomersSuccess.type);
 
     const delResults: any[] = [];
-    const delSub = effects.delete$.subscribe((a) => delResults.push(a));
+    const delSub = effects.delete$.subscribe(a => delResults.push(a));
     actions$.next(deleteCustomer({ id: '1' }));
     expect(delResults[0].type).toBe(deleteCustomerSuccess.type);
 
@@ -136,13 +169,13 @@ describe('Customers state', () => {
         { provide: Actions, useValue: new Actions(actions$) },
         { provide: CustomersApi, useValue: api },
         { provide: ToastService, useValue: toast },
-        { provide: TranslateService, useValue: i18n }
-      ]
+        { provide: TranslateService, useValue: i18n },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new CustomersEffects());
     const results: any[] = [];
-    const sub = effects.load$.subscribe((a) => results.push(a));
+    const sub = effects.load$.subscribe(a => results.push(a));
 
     actions$.next(loadCustomers({ params: { page: 1 } }));
     expect(results[0]).toEqual(loadCustomersSuccess({ data: [], total: 0 }));
@@ -152,7 +185,10 @@ describe('Customers state', () => {
 
   it('CustomersEffects emits failure actions on errors', () => {
     const actions$ = new Subject<any>();
-    const api = { list: vi.fn(() => throwError(() => new Error('fail'))), delete: vi.fn(() => throwError(() => new Error('fail'))) };
+    const api = {
+      list: vi.fn(() => throwError(() => new Error('fail'))),
+      delete: vi.fn(() => throwError(() => new Error('fail'))),
+    };
     const toast = { success: vi.fn() };
     const i18n = { instant: (k: string) => k };
 
@@ -161,18 +197,18 @@ describe('Customers state', () => {
         { provide: Actions, useValue: new Actions(actions$) },
         { provide: CustomersApi, useValue: api },
         { provide: ToastService, useValue: toast },
-        { provide: TranslateService, useValue: i18n }
-      ]
+        { provide: TranslateService, useValue: i18n },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new CustomersEffects());
     const results: any[] = [];
-    const sub = effects.load$.subscribe((a) => results.push(a));
+    const sub = effects.load$.subscribe(a => results.push(a));
     actions$.next(loadCustomers({ params: { page: 1 } }));
     expect(results[0].type).toBe(loadCustomersFailure.type);
 
     const delResults: any[] = [];
-    const delSub = effects.delete$.subscribe((a) => delResults.push(a));
+    const delSub = effects.delete$.subscribe(a => delResults.push(a));
     actions$.next(deleteCustomer({ id: '1' }));
     expect(delResults[0].type).toBe(deleteCustomerFailure.type);
 

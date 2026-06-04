@@ -1,12 +1,21 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { loadLatestCustomer } from '@features/dashboard/state/latest-customer.actions';
-import { selectLatestCustomer, selectLatestCustomerLoaded, selectLatestCustomerLoading, selectLatestCustomerWallet } from '@features/dashboard/state/latest-customer.selectors';
+import {
+  selectLatestCustomer,
+  selectLatestCustomerLoaded,
+  selectLatestCustomerLoading,
+  selectLatestCustomerWallet,
+} from '@features/dashboard/state/latest-customer.selectors';
 
 @Injectable({ providedIn: 'root' })
 export class LatestCustomerStore {
-  private store = inject(Store);
+  private readonly store = inject(Store);
 
   readonly customer$ = this.store.select(selectLatestCustomer);
   readonly wallet$ = this.store.select(selectLatestCustomerWallet);

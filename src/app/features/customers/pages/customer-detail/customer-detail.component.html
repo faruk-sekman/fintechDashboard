@@ -1,6 +1,6 @@
 <div class="page-shell customer-detail">
   <div class="page-header items-center">
-    @if (loadingCustomer) {
+    @if (loadingCustomer()) {
       <div>
         <app-ui-skeleton width="200px" height="30px"></app-ui-skeleton>
         <div class="mt-2">
@@ -38,7 +38,7 @@
     }
   </div>
 
-  @if (customer; as c) {
+  @if (customer(); as c) {
     <div class="card detail-summary">
       <div class="detail-summary__grid motion-stagger">
         <div class="detail-pill">
@@ -70,13 +70,16 @@
 
       <div class="detail-summary__address">
         <div class="detail-label">{{ 'customers.address.title' | translate }}</div>
-        <div class="detail-value">{{ c.address.line1 }}, {{ c.address.postalCode }} {{ c.address.city }} / {{ c.address.country }}</div>
+        <div class="detail-value">
+          {{ c.address.line1 }}, {{ c.address.postalCode }} {{ c.address.city }} /
+          {{ c.address.country }}
+        </div>
       </div>
     </div>
   } @else {
     <div class="card detail-summary">
       <div class="detail-summary__grid">
-        @for (i of [1,2,3,4,5,6]; track i) {
+        @for (i of [1, 2, 3, 4, 5, 6]; track i) {
           <div class="detail-pill detail-pill--skeleton">
             <app-ui-skeleton width="90px" height="11px"></app-ui-skeleton>
             <app-ui-skeleton height="16px"></app-ui-skeleton>
@@ -95,25 +98,30 @@
       <div class="card-title">{{ 'wallet.title' | translate }}</div>
       <div class="card-sub">{{ 'wallet.subtitle' | translate }}</div>
 
-      @if (wallet; as w) {
+      @if (wallet(); as w) {
         <div class="wallet">
           <div class="balance">
             <div class="detail-label">{{ 'wallet.balance' | translate }}</div>
-            <div class="detail-value"><span [appCountUp]="w.balance" [countUpDecimals]="2"></span> {{ w.currency }}</div>
+            <div class="detail-value">
+              <span [appCountUp]="w.balance" [countUpDecimals]="2"></span> {{ w.currency }}
+            </div>
           </div>
 
           <div class="limits">
             <app-ui-form
               #limitsFormRef
               [fields]="limitFields"
-              [initialValue]="limitsInitialValue"
+              [initialValue]="limitsInitialValue()"
               [formValidators]="limitFormValidators"
               [preventSubmit]="true"
               [showSubmit]="false"
               formClass="filters-grid"
             ></app-ui-form>
 
-            @if (limitsFormRef?.form?.errors?.['limitMismatch'] && (limitsFormRef.form.dirty || limitsFormRef.form.touched)) {
+            @if (
+              limitsFormRef?.form?.errors?.['limitMismatch'] &&
+              (limitsFormRef.form.dirty || limitsFormRef.form.touched)
+            ) {
               <div class="err">{{ 'validation.limitMismatch' | translate }}</div>
             }
 
@@ -122,7 +130,7 @@
                 <app-ui-button
                   variant="ghost"
                   type="button"
-                  [disabled]="savingLimits"
+                  [disabled]="savingLimits()"
                   (click)="resetLimits()"
                 >
                   <i class="ri-eraser-line ui-button__icon" aria-hidden="true"></i>
@@ -131,11 +139,16 @@
               }
               <app-ui-button
                 type="button"
-                [disabled]="savingLimits || !limitsFormRef?.form || limitsFormRef.form.pristine || limitsFormRef.form.invalid"
+                [disabled]="
+                  savingLimits() ||
+                  !limitsFormRef?.form ||
+                  limitsFormRef.form.pristine ||
+                  limitsFormRef.form.invalid
+                "
                 (click)="saveLimits()"
               >
                 <i class="ri-save-3-line ui-button__icon" aria-hidden="true"></i>
-                {{ savingLimits ? ('common.saving' | translate) : ('common.save' | translate) }}
+                {{ savingLimits() ? ('common.saving' | translate) : ('common.save' | translate) }}
               </app-ui-button>
             </div>
           </div>
@@ -170,11 +183,10 @@
     <div class="card">
       <div class="card-title">{{ 'transactions.filters' | translate }}</div>
       <div class="filters-form">
-        @if (showTxSkeleton) {
+        @if (showTxSkeleton()) {
           <div class="filters-form__skeleton">
             <div class="filters-grid-skeleton">
-            
-              @for (i of [1,2,3,4]; track i) {
+              @for (i of [1, 2, 3, 4]; track i) {
                 <div class="form-field">
                   <app-ui-skeleton height="12px" width="120px"></app-ui-skeleton>
                   <app-ui-skeleton height="42px" radius="14px"></app-ui-skeleton>
@@ -192,17 +204,25 @@
           </div>
         }
 
-        <div class="filters-form__content" [class.filters-form__content--loading]="showTxSkeleton">
+        <div
+          class="filters-form__content"
+          [class.filters-form__content--loading]="showTxSkeleton()"
+        >
           <app-ui-form
             #txFiltersFormRef
             [fields]="txFilterFields"
-            [initialValue]="txFilterInitialValue"
+            [initialValue]="txFilterInitialValue()"
             [showSubmit]="false"
             formClass="filters-grid"
           ></app-ui-form>
 
           <div class="filters-actions">
-            <app-ui-button variant="ghost" type="button" (click)="clearTxFilters()" [disabled]="txFiltersFormRef.form.pristine">
+            <app-ui-button
+              variant="ghost"
+              type="button"
+              (click)="clearTxFilters()"
+              [disabled]="txFiltersFormRef.form.pristine"
+            >
               <i class="ri-filter-off-line ui-button__icon" aria-hidden="true"></i>
               {{ 'common.clear' | translate }}
             </app-ui-button>
@@ -216,22 +236,22 @@
     [columns]="txColumns"
     [data]="(txData$ | async) ?? []"
     [loading]="(loadingTx$ | async) ?? false"
-    [page]="txPage"
-    [pageSize]="txPageSize"
+    [page]="txPage()"
+    [pageSize]="txPageSize()"
     [total]="(txTotal$ | async) ?? 0"
     rowActionLabelKey="common.inspect"
     (pageChange)="onTxPageChange($event)"
-    (rowAction)="null"
+    (rowAction)="(null)"
   />
 
   <app-ui-confirm-dialog
-    [open]="deleteModalOpen"
+    [open]="deleteModalOpen()"
     titleKey="customers.deleteTitle"
     messageKey="customers.deleteConfirm"
-    [messageParams]="{ name: customer?.name ?? '' }"
+    [messageParams]="{ name: customer()?.name ?? '' }"
     confirmLabelKey="common.delete"
     cancelLabelKey="common.cancel"
-    [loading]="deletingCustomer"
+    [loading]="deletingCustomer()"
     (confirm)="confirmDelete()"
     (cancel)="closeDelete()"
   ></app-ui-confirm-dialog>

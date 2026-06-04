@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,14 +34,14 @@ import { UiConfirmDialogComponent } from '@shared/components/ui-confirm-dialog/u
     UiSelectComponent,
     UiButtonComponent,
     UiSkeletonComponent,
-    UiConfirmDialogComponent
+    UiConfirmDialogComponent,
   ],
   templateUrl: './customer-list.component.html',
-  styleUrl: './customer-list.component.scss'
+  styleUrl: './customer-list.component.scss',
 })
 export class CustomerListComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
-  private deleteTarget$ = new BehaviorSubject<Customer | null>(null);
+  private readonly destroy$ = new Subject<void>();
+  private readonly deleteTarget$ = new BehaviorSubject<Customer | null>(null);
 
   search = new FormControl<string>('', { nonNullable: true });
   kycStatus = new FormControl<string>('', { nonNullable: true });
@@ -60,15 +64,15 @@ export class CustomerListComponent implements OnInit, OnDestroy {
       headerKey: 'customers.kycStatus',
       type: 'badge',
       widthClass: 'w-[140px]',
-      badgeColor: (value) => getKycStatusBadgeColor(value)
+      badgeColor: value => getKycStatusBadgeColor(value),
     },
     {
       key: 'isActive',
       headerKey: 'customers.active',
       type: 'toggle',
       widthClass: 'w-[120px]',
-      formatter: (value) => (value ? this.i18n.instant('common.yes') : this.i18n.instant('common.no'))
-    }
+      formatter: value => this.formatBoolean(value),
+    },
   ];
 
   kycStatusOptions: SelectOption[] = KYC_STATUS_FILTER_OPTIONS;
@@ -76,23 +80,27 @@ export class CustomerListComponent implements OnInit, OnDestroy {
   activeOptions: SelectOption[] = [
     { labelKey: 'common.all', value: '' },
     { labelKey: 'common.yes', value: 'true' },
-    { labelKey: 'common.no', value: 'false' }
+    { labelKey: 'common.no', value: 'false' },
   ];
 
-  private customersStore = inject(CustomersStore);
+  private readonly customersStore = inject(CustomersStore);
   data$ = this.customersStore.data$;
   loading$ = this.customersStore.loading$;
   total$ = this.customersStore.total$;
   deleting$ = this.customersStore.deleting$;
   deletingId$ = this.customersStore.deletingId$;
   deletingTarget$ = combineLatest([this.deleting$, this.deletingId$, this.deleteTarget$]).pipe(
-    map(([deleting, deletingId, target]) => !!target && deleting && deletingId === target.id)
+    map(([deleting, deletingId, target]) => !!target && deleting && deletingId === target.id),
   );
 
-  constructor(private router: Router, private route: ActivatedRoute, private i18n: TranslateService) {}
+  constructor(
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly i18n: TranslateService,
+  ) {}
 
   ngOnInit(): void {
-    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const search = params.get('search') ?? '';
       const kyc = params.get('kycStatus') ?? '';
       const active = params.get('isActive') ?? '';
@@ -108,20 +116,20 @@ export class CustomerListComponent implements OnInit, OnDestroy {
 
     this.search.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((value) => this.updateQueryParams({ search: value, page: 1 }));
+      .subscribe(value => this.updateQueryParams({ search: value, page: 1 }));
 
     this.kycStatus.valueChanges
       .pipe(distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((value) => this.updateQueryParams({ kycStatus: value, page: 1 }));
+      .subscribe(value => this.updateQueryParams({ kycStatus: value, page: 1 }));
 
     this.isActive.valueChanges
       .pipe(distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((value) => this.updateQueryParams({ isActive: value, page: 1 }));
+      .subscribe(value => this.updateQueryParams({ isActive: value, page: 1 }));
 
     this.customersStore.deleteSuccess$
       .pipe(
         filter(({ id }) => !!this.deleteTarget && this.deleteTarget.id === id),
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
       )
       .subscribe(() => {
         this.closeDelete();
@@ -175,15 +183,14 @@ export class CustomerListComponent implements OnInit, OnDestroy {
 
   private load() {
     const status = (this.kycStatus.value || undefined) as KycStatus | undefined;
-    const active =
-      this.isActive.value === '' ? undefined : this.isActive.value === 'true';
+    const active = this.activeFilterValue();
 
     this.customersStore.load({
       page: this.page,
       pageSize: this.pageSize,
       search: this.search.value || undefined,
       kycStatus: status,
-      isActive: active
+      isActive: active,
     });
   }
 
@@ -201,13 +208,33 @@ export class CustomerListComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
-        search: nextSearch ? nextSearch : null,
-        kycStatus: nextKyc ? nextKyc : null,
-        isActive: nextActive ? nextActive : null,
-        page: nextPage && nextPage > 1 ? nextPage : null
+        search: this.blankToNull(nextSearch),
+        kycStatus: this.blankToNull(nextKyc),
+        isActive: this.blankToNull(nextActive),
+        page: this.pageQueryValue(nextPage),
       },
       queryParamsHandling: 'merge',
-      replaceUrl: true
+      replaceUrl: true,
     });
+  }
+
+  private formatBoolean(value: unknown): string {
+    if (value) return this.i18n.instant('common.yes');
+    return this.i18n.instant('common.no');
+  }
+
+  private activeFilterValue(): boolean | undefined {
+    if (this.isActive.value === '') return undefined;
+    return this.isActive.value === 'true';
+  }
+
+  private blankToNull(value: string): string | null {
+    if (value) return value;
+    return null;
+  }
+
+  private pageQueryValue(page: number): number | null {
+    if (page && page > 1) return page;
+    return null;
   }
 }

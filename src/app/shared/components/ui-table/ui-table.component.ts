@@ -1,17 +1,36 @@
-import { Component, ContentChild, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ContentChild,
+  EventEmitter,
+  Input,
+  Output,
+  TemplateRef,
+} from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { UiButtonComponent } from '@shared/components/ui-button/ui-button.component';
-import { UiBadgeComponent, UiBadgeColor, UiBadgeIconPosition, ClassValue } from '@shared/components/ui-badge/ui-badge.component';
+import { UiBadgeComponent, UiBadgeColor } from '@shared/components/ui-badge/ui-badge.component';
 import { UiPaginationComponent } from '@shared/components/ui-pagination/ui-pagination.component';
 import { ColumnDef, PageEvent } from '@shared/components/ui-table/ui-table.types';
 
 @Component({
   selector: 'app-ui-table',
   standalone: true,
-  imports: [CommonModule, TranslateModule, UiButtonComponent, UiBadgeComponent, UiPaginationComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    TranslateModule,
+    UiButtonComponent,
+    UiBadgeComponent,
+    UiPaginationComponent,
+  ],
   templateUrl: './ui-table.component.html',
-  styleUrls: ['./ui-table.component.scss']
+  styleUrls: ['./ui-table.component.scss'],
 })
 export class UiTableComponent<T extends Record<string, any>> {
   @Input({ required: true }) columns!: ColumnDef<T>[];
@@ -31,7 +50,7 @@ export class UiTableComponent<T extends Record<string, any>> {
 
   @ContentChild('rowActions', { read: TemplateRef }) rowActionsTemplate?: TemplateRef<unknown>;
 
-  constructor(private i18n: TranslateService) {}
+  constructor(private readonly i18n: TranslateService) {}
 
   displayCell(col: ColumnDef<T>, row: T): string {
     const raw = row[col.key as string];
@@ -39,51 +58,49 @@ export class UiTableComponent<T extends Record<string, any>> {
     if (raw === undefined || raw === null) return '-';
 
     if (col.type === 'currency' && typeof raw === 'number') {
-      return new Intl.NumberFormat(undefined, { style: 'currency', currency: (row as any).currency ?? 'TRY' }).format(raw);
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: (row as any).currency ?? 'TRY',
+      }).format(raw);
     }
     if (col.type === 'date') {
       const d = new Date(String(raw));
-      return isNaN(d.getTime()) ? String(raw) : d.toLocaleString(this.i18n.currentLang);
+      if (isNaN(d.getTime())) return String(raw);
+      return d.toLocaleString(this.i18n.currentLang);
     }
     return String(raw);
   }
 
   badgeColor(col: ColumnDef<T>, row: T): UiBadgeColor {
     const value = row[col.key as string];
-    const resolved = typeof col.badgeColor === 'function' ? col.badgeColor(value, row) : col.badgeColor;
+    let resolved: UiBadgeColor | undefined;
+    if (typeof col.badgeColor === 'function') {
+      resolved = col.badgeColor(value, row);
+    } else {
+      resolved = col.badgeColor;
+    }
     return resolved ?? 'gray';
-  }
-
-  badgeClass(col: ColumnDef<T>, row: T): ClassValue | null {
-    const value = row[col.key as string];
-    const resolved = typeof col.badgeClass === 'function' ? col.badgeClass(value, row) : col.badgeClass;
-    return resolved ?? null;
   }
 
   badgeIcon(col: ColumnDef<T>, row: T): string | null {
     const value = row[col.key as string];
-    const resolved = typeof col.badgeIcon === 'function' ? col.badgeIcon(value, row) : col.badgeIcon;
-    return resolved ?? null;
-  }
-
-  badgeIconPosition(col: ColumnDef<T>, row: T): UiBadgeIconPosition {
-    const value = row[col.key as string];
-    const resolved = typeof col.badgeIconPosition === 'function'
-      ? col.badgeIconPosition(value, row)
-      : col.badgeIconPosition;
-    return resolved ?? 'left';
-  }
-
-  badgeIconClass(col: ColumnDef<T>, row: T): ClassValue | null {
-    const value = row[col.key as string];
-    const resolved = typeof col.badgeIconClass === 'function'
-      ? col.badgeIconClass(value, row)
-      : col.badgeIconClass;
+    let resolved: string | null | undefined;
+    if (typeof col.badgeIcon === 'function') {
+      resolved = col.badgeIcon(value, row);
+    } else {
+      resolved = col.badgeIcon;
+    }
     return resolved ?? null;
   }
 
   toggleOn(col: ColumnDef<T>, row: T): boolean {
     return Boolean(row[col.key as string]);
+  }
+
+  /** Stable identity for @for: prefer the row's `id`, fall back to index. */
+  trackRow(row: T, index: number): string | number {
+    const id = row['id'];
+    return typeof id === 'string' || typeof id === 'number' ? id : index;
   }
 
   onPageChange(e: PageEvent) {

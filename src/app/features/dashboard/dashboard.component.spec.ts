@@ -1,12 +1,41 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { DashboardComponent } from './dashboard.component';
-import { CustomersStore } from '@features/customers/state';
-import { LatestCustomerStore } from '@features/dashboard/state';
+import { DashboardStatsStore, LatestCustomerStore } from '@features/dashboard/state';
 
-const customerA = { id: '1', kycStatus: 'VERIFIED', isActive: true, dateOfBirth: '2000-01-01', updatedAt: '2024-01-01', createdAt: '', name: '', email: '', phone: '', walletNumber: '', nationalId: 0, address: { country: '', city: '', postalCode: '', line1: '' } } as any;
-const customerB = { id: '2', kycStatus: 'UNVERIFIED', isActive: false, dateOfBirth: '1990-01-01', updatedAt: '2024-02-01', createdAt: '', name: '', email: '', phone: '', walletNumber: '', nationalId: 0, address: { country: '', city: '', postalCode: '', line1: '' } } as any;
+const customerA = {
+  id: '1',
+  kycStatus: 'VERIFIED',
+  isActive: true,
+  dateOfBirth: '2000-01-01',
+  updatedAt: '2024-01-01',
+  createdAt: '',
+  name: '',
+  email: '',
+  phone: '',
+  walletNumber: '',
+  nationalId: 0,
+  address: { country: '', city: '', postalCode: '', line1: '' },
+} as any;
+const customerB = {
+  id: '2',
+  kycStatus: 'UNVERIFIED',
+  isActive: false,
+  dateOfBirth: '1990-01-01',
+  updatedAt: '2024-02-01',
+  createdAt: '',
+  name: '',
+  email: '',
+  phone: '',
+  walletNumber: '',
+  nationalId: 0,
+  address: { country: '', city: '', postalCode: '', line1: '' },
+} as any;
 
 describe('DashboardComponent', () => {
   beforeEach(() => {
@@ -15,29 +44,29 @@ describe('DashboardComponent', () => {
 
   function createComponent(total$Override?: any) {
     const data$ = new BehaviorSubject<any[]>([]);
-    const customersStore = {
+    const statsStore = {
       data$,
       total$: total$Override ?? of(2),
       loading$: of(false),
-      load: vi.fn()
+      load: vi.fn(),
     };
     const latestStore = {
       customer$: new BehaviorSubject<any>(null),
       wallet$: new BehaviorSubject<any>(null),
       loading$: of(false),
       loaded$: of(false),
-      load: vi.fn()
+      load: vi.fn(),
     };
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: CustomersStore, useValue: customersStore },
-        { provide: LatestCustomerStore, useValue: latestStore }
-      ]
+        { provide: DashboardStatsStore, useValue: statsStore },
+        { provide: LatestCustomerStore, useValue: latestStore },
+      ],
     });
 
     const component = TestBed.runInInjectionContext(() => new DashboardComponent());
-    return { component, data$, customersStore, latestStore };
+    return { component, data$, statsStore, latestStore };
   }
 
   it('calculates kyc counts and age stats', () => {
@@ -51,9 +80,9 @@ describe('DashboardComponent', () => {
   });
 
   it('finds latest updated customer and triggers load', () => {
-    const { component, data$, customersStore, latestStore } = createComponent();
+    const { component, data$, statsStore, latestStore } = createComponent();
     component.ngOnInit();
-    expect(customersStore.load).toHaveBeenCalledWith({ page: 1, pageSize: 60 });
+    expect(statsStore.load).toHaveBeenCalledWith({ page: 1, pageSize: 60 });
 
     data$.next([customerA, customerB]);
     expect(latestStore.load).toHaveBeenCalledWith('2');
@@ -74,7 +103,11 @@ describe('DashboardComponent', () => {
   it('getAge does not adjust when birthday has passed', () => {
     const { component } = createComponent();
     const today = new Date();
-    const dob = new Date(today.getFullYear() - 30, today.getMonth(), Math.max(1, today.getDate() - 1));
+    const dob = new Date(
+      today.getFullYear() - 30,
+      today.getMonth(),
+      Math.max(1, today.getDate() - 1),
+    );
     const iso = `${dob.getFullYear()}-${String(dob.getMonth() + 1).padStart(2, '0')}-${String(dob.getDate()).padStart(2, '0')}`;
     const age = (component as any).getAge(iso);
     expect(age).toBe(30);
@@ -105,7 +138,7 @@ describe('DashboardComponent', () => {
   it('builds summary view model values from customer list', () => {
     const { component, data$ } = createComponent();
     const results: any[] = [];
-    const sub = component.summaryVm$.subscribe((v) => results.push(v));
+    const sub = component.summaryVm$.subscribe(v => results.push(v));
     data$.next([customerA, customerB]);
 
     expect(results.at(-1)?.total).toBe(2);
@@ -116,7 +149,7 @@ describe('DashboardComponent', () => {
   it('uses data length when total is zero and handles empty kyc totals', () => {
     const { component, data$ } = createComponent(of(0));
     const results: any[] = [];
-    const sub = component.summaryVm$.subscribe((v) => results.push(v));
+    const sub = component.summaryVm$.subscribe(v => results.push(v));
     data$.next([]);
     const latest = results.at(-1);
     expect(latest?.total).toBe(0);
@@ -128,7 +161,7 @@ describe('DashboardComponent', () => {
   it('handles null data in vm$', () => {
     const { component, data$ } = createComponent(of(0));
     const results: any[] = [];
-    const sub = component.summaryVm$.subscribe((v) => results.push(v));
+    const sub = component.summaryVm$.subscribe(v => results.push(v));
     data$.next(null as any);
     const latest = results.at(-1);
     expect(latest?.total).toBe(0);
@@ -138,7 +171,7 @@ describe('DashboardComponent', () => {
   it('combines latest customer and wallet', () => {
     const { component, latestStore } = createComponent();
     const results: any[] = [];
-    const sub = component.latestCustomerSummary$.subscribe((v) => results.push(v));
+    const sub = component.latestCustomerSummary$.subscribe(v => results.push(v));
     (latestStore.customer$ as BehaviorSubject<any>).next({ id: '1' });
     (latestStore.wallet$ as BehaviorSubject<any>).next({ id: 'w1' });
     expect(results.at(-1)).toEqual({ customer: { id: '1' }, wallet: { id: 'w1' } });

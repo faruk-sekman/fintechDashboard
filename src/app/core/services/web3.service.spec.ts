@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { of, lastValueFrom } from 'rxjs';
 
@@ -81,7 +85,9 @@ describe('Web3Service', () => {
       const s = make();
       expect(s.assessRisk({}, makeSignals({ mixerExposure: true })).decision).toBe('REVIEW');
       expect(s.assessRisk({}, makeSignals({ highVelocity: true })).decision).toBe('REVIEW');
-      expect(s.assessRisk({}, makeSignals({ suspiciousCounterparty: true })).decision).toBe('REVIEW');
+      expect(s.assessRisk({}, makeSignals({ suspiciousCounterparty: true })).decision).toBe(
+        'REVIEW',
+      );
     });
 
     it('no flagged signals -> ALLOW', () => {
@@ -123,7 +129,9 @@ describe('Web3Service', () => {
 
     it('builds explorer deep-links', () => {
       const s = make();
-      expect(s.explorerAddressUrl('0xabc')).toBe(`${environment.web3.explorerBaseUrl}/address/0xabc`);
+      expect(s.explorerAddressUrl('0xabc')).toBe(
+        `${environment.web3.explorerBaseUrl}/address/0xabc`,
+      );
       expect(s.explorerTxUrl('0xdef')).toBe(`${environment.web3.explorerBaseUrl}/tx/0xdef`);
     });
   });
@@ -132,7 +140,10 @@ describe('Web3Service', () => {
     it('reports no wallet and a no-op cleanup', () => {
       const s = make();
       expect(s.hasWallet()).toBe(false);
-      const off = s.onWalletEvents({ onAccountsChanged: () => undefined, onChainChanged: () => undefined });
+      const off = s.onWalletEvents({
+        onAccountsChanged: () => undefined,
+        onChainChanged: () => undefined,
+      });
       expect(typeof off).toBe('function');
       off();
     });
@@ -142,7 +153,9 @@ describe('Web3Service', () => {
     });
 
     it('personalSign rejects with a typed no-wallet error', async () => {
-      await expect(make().personalSign('0xabc', 'audit')).rejects.toMatchObject({ message: 'no-wallet' });
+      await expect(make().personalSign('0xabc', 'audit')).rejects.toMatchObject({
+        message: 'no-wallet',
+      });
     });
   });
 
@@ -158,7 +171,11 @@ describe('Web3Service', () => {
     });
 
     it('throws on a JSON-RPC error body (HTTP 200 with error)', async () => {
-      const http = httpReturning({ jsonrpc: '2.0', id: 1, error: { code: -32000, message: 'bad request' } });
+      const http = httpReturning({
+        jsonrpc: '2.0',
+        id: 1,
+        error: { code: -32000, message: 'bad request' },
+      });
       const s = new Web3Service(http as never);
       await expect(lastValueFrom(s.getBalance('0xabc'))).rejects.toThrow(/bad request/);
     });
@@ -204,7 +221,8 @@ describe('Web3Service', () => {
     it('connects, signs, and wires up + tears down events', async () => {
       const provider = {
         request: vi.fn(async (args: { method: string }) => {
-          if (args.method === 'eth_requestAccounts') return ['0xAbC0000000000000000000000000000000000001'];
+          if (args.method === 'eth_requestAccounts')
+            return ['0xAbC0000000000000000000000000000000000001'];
           if (args.method === 'eth_chainId') return '0x1';
           if (args.method === 'personal_sign') return '0xsignature';
           return null;
@@ -226,7 +244,10 @@ describe('Web3Service', () => {
 
         expect(await s.personalSign(op.address, 'audit')).toBe('0xsignature');
 
-        const off = s.onWalletEvents({ onAccountsChanged: () => undefined, onChainChanged: () => undefined });
+        const off = s.onWalletEvents({
+          onAccountsChanged: () => undefined,
+          onChainChanged: () => undefined,
+        });
         expect(provider.on).toHaveBeenCalledWith('accountsChanged', expect.any(Function));
         off();
         expect(provider.removeListener).toHaveBeenCalled();

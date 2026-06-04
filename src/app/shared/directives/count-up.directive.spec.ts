@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Component } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
@@ -13,7 +17,7 @@ import { CountUpDirective } from '@shared/directives/count-up.directive';
     [countUpDecimals]="decimals"
     [countUpPrefix]="prefix"
     [countUpSuffix]="suffix"
-  ></span>`
+  ></span>`,
 })
 class HostComponent {
   value: number | null = 0;
@@ -46,7 +50,7 @@ describe('CountUpDirective', () => {
   function flush(timestamp: number): void {
     const pending = rafQueue;
     rafQueue = [];
-    pending.forEach((cb) => cb(timestamp));
+    pending.forEach(cb => cb(timestamp));
   }
 
   function setup(init: Partial<HostComponent> = {}): {
@@ -70,7 +74,7 @@ describe('CountUpDirective', () => {
       removeListener: vi.fn(),
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn()
+      dispatchEvent: vi.fn(),
     })) as unknown as typeof window.matchMedia;
   }
 

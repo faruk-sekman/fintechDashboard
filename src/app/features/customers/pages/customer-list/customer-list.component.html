@@ -43,18 +43,30 @@
 
     <div class="filters motion-stagger">
       <div class="form-field">
-        <label>{{ 'customers.search' | translate }}</label>
-        <app-ui-input [control]="search" [placeholder]="'customers.searchPlaceholder' | translate"></app-ui-input>
+        <label for="flt-search">{{ 'customers.search' | translate }}</label>
+        <app-ui-input
+          id="flt-search"
+          [control]="search"
+          [placeholder]="'customers.searchPlaceholder' | translate"
+        ></app-ui-input>
       </div>
 
       <div class="form-field">
-        <label>{{ 'customers.kycStatus' | translate }}</label>
-        <app-ui-select [control]="kycStatus" [options]="kycStatusOptions"></app-ui-select>
+        <label for="flt-kyc">{{ 'customers.kycStatus' | translate }}</label>
+        <app-ui-select
+          id="flt-kyc"
+          [control]="kycStatus"
+          [options]="kycStatusOptions"
+        ></app-ui-select>
       </div>
 
       <div class="form-field">
-        <label>{{ 'customers.active' | translate }}</label>
-        <app-ui-select [control]="isActive" [options]="activeOptions"></app-ui-select>
+        <label for="flt-active">{{ 'customers.active' | translate }}</label>
+        <app-ui-select
+          id="flt-active"
+          [control]="isActive"
+          [options]="activeOptions"
+        ></app-ui-select>
       </div>
 
       <div class="form-field filters__actions">
@@ -82,12 +94,10 @@
       <div class="row-actions">
         <app-ui-button size="sm" variant="ghost" type="button" (click)="open(row)">
           <i class="ri-eye-line ui-button__icon" aria-hidden="true"></i>
-         
         </app-ui-button>
 
         <app-ui-button size="sm" variant="danger" type="button" (click)="openDelete(row)">
           <i class="ri-delete-bin-6-line ui-button__icon" aria-hidden="true"></i>
-    
         </app-ui-button>
       </div>
     </ng-template>

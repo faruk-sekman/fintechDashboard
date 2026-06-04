@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
@@ -12,7 +16,7 @@ import { routeFade } from '@shared/animations/route-animations';
   imports: [CommonModule, RouterOutlet, TranslateModule, HeaderComponent, SidebarComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss',
-  animations: [routeFade]
+  animations: [routeFade],
 })
 export class MainLayoutComponent {
   mobileNavOpen = false;

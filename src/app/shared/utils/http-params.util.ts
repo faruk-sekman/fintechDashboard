@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { HttpParams } from '@angular/common/http';
 
 export type HttpParamValue = string | number | boolean | null | undefined;

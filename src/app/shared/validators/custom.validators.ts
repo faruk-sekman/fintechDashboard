@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 function setCtrlError(ctrl: AbstractControl | null, key: string, on: boolean) {
@@ -8,11 +12,23 @@ function setCtrlError(ctrl: AbstractControl | null, key: string, on: boolean) {
     ctrl.setErrors({ ...errors, [key]: true });
   } else if (errors[key]) {
     const { [key]: _removed, ...rest } = errors as Record<string, any>;
-    ctrl.setErrors(Object.keys(rest).length ? rest : null);
+    if (Object.keys(rest).length) {
+      ctrl.setErrors(rest);
+      return;
+    }
+    ctrl.setErrors(null);
   }
 }
 
-export function walletLimitsConsistencyValidator(dailyKey = 'dailyLimit', monthlyKey = 'monthlyLimit'): ValidatorFn {
+function numberOrNull(hasValue: boolean, value: unknown): number | null {
+  if (hasValue) return Number(value);
+  return null;
+}
+
+export function walletLimitsConsistencyValidator(
+  dailyKey = 'dailyLimit',
+  monthlyKey = 'monthlyLimit',
+): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
     const dailyCtrl = group.get(dailyKey);
     const monthlyCtrl = group.get(monthlyKey);
@@ -20,8 +36,8 @@ export function walletLimitsConsistencyValidator(dailyKey = 'dailyLimit', monthl
     const monthlyRaw = monthlyCtrl?.value;
     const hasDaily = dailyRaw !== null && dailyRaw !== undefined && dailyRaw !== '';
     const hasMonthly = monthlyRaw !== null && monthlyRaw !== undefined && monthlyRaw !== '';
-    const daily = hasDaily ? Number(dailyRaw) : null;
-    const monthly = hasMonthly ? Number(monthlyRaw) : null;
+    const daily = numberOrNull(hasDaily, dailyRaw);
+    const monthly = numberOrNull(hasMonthly, monthlyRaw);
 
     if (daily === null || monthly === null) {
       setCtrlError(dailyCtrl, 'limitMismatch', false);
@@ -56,6 +72,14 @@ export function turkishNationalIdValidator(): ValidatorFn {
     if (raw.startsWith('0')) return { nationalIdStartsWithZero: true };
     if (!/^\d+$/.test(raw)) return { nationalIdNumeric: true };
     if (raw.length !== 11) return { nationalIdLength: true };
+    // Official TC Kimlik No checksum (digits 10 and 11) — pure arithmetic, no crypto.
+    const d = raw.split('').map(Number);
+    const oddSum = d[0] + d[2] + d[4] + d[6] + d[8];
+    const evenSum = d[1] + d[3] + d[5] + d[7];
+    const digit10 = (((oddSum * 7 - evenSum) % 10) + 10) % 10;
+    if (digit10 !== d[9]) return { nationalIdChecksum: true };
+    const firstTenSum = d.slice(0, 10).reduce((sum, n) => sum + n, 0);
+    if (firstTenSum % 10 !== d[10]) return { nationalIdChecksum: true };
     return null;
   };
 }
@@ -90,7 +114,8 @@ export function noMultipleSpacesValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const raw = String(control.value ?? '');
     if (!raw) return null;
-    return /\s{2,}/.test(raw) ? { multipleSpaces: true } : null;
+    if (/\s{2,}/.test(raw)) return { multipleSpaces: true };
+    return null;
   };
 }
 
@@ -125,7 +150,8 @@ export function nameValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const raw = String(control.value ?? '').trim();
     if (!raw) return null;
-    return re.test(raw) ? null : { nameInvalid: true };
+    if (re.test(raw)) return null;
+    return { nameInvalid: true };
   };
 }
 
@@ -134,7 +160,10 @@ export function phoneNumberValidator(): ValidatorFn {
     const raw = String(control.value ?? '').trim();
     if (!raw) return null;
     if (!/^\+?\d+$/.test(raw)) return { phoneInvalid: true };
-    const digits = raw.startsWith('+') ? raw.slice(1) : raw;
+    let digits = raw;
+    if (raw.startsWith('+')) {
+      digits = raw.slice(1);
+    }
     if (!/^[0-9]{7,15}$/.test(digits)) return { phoneInvalid: true };
     return null;
   };
@@ -161,7 +190,8 @@ export function strictEmailValidator(): ValidatorFn {
     const [local, domain] = parts;
     if (!local || !domain || local.length > 64) return { email: true };
     if (raw.includes('..')) return { email: true };
-    return re.test(raw) ? null : { email: true };
+    if (re.test(raw)) return null;
+    return { email: true };
   };
 }
 
@@ -169,21 +199,29 @@ export function dateOfBirthValidator(options?: { minAge?: number; maxAge?: numbe
   return (control: AbstractControl): ValidationErrors | null => {
     const raw = String(control.value ?? '').trim();
     if (!raw) return null;
-    const parts = raw.split('-').map((p) => Number(p));
-    if (parts.length !== 3 || parts.some((p) => !Number.isFinite(p))) return { dateInvalid: true };
+    const parts = raw.split('-').map(p => Number(p));
+    if (parts.length !== 3 || parts.some(p => !Number.isFinite(p))) return { dateInvalid: true };
     const [year, month, day] = parts;
     if (year < 1900 || month < 1 || month > 12 || day < 1 || day > 31) return { dateInvalid: true };
     const dob = new Date(year, month - 1, day);
-    if (dob.getFullYear() !== year || dob.getMonth() !== month - 1 || dob.getDate() !== day) return { dateInvalid: true };
+    if (dob.getFullYear() !== year || dob.getMonth() !== month - 1 || dob.getDate() !== day)
+      return { dateInvalid: true };
     const today = new Date();
     const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     if (dob > todayMid) return { dateInFuture: true };
 
-    const age = todayMid.getFullYear() - dob.getFullYear()
-      - (todayMid.getMonth() < dob.getMonth() || (todayMid.getMonth() === dob.getMonth() && todayMid.getDate() < dob.getDate()) ? 1 : 0);
+    let age = todayMid.getFullYear() - dob.getFullYear();
+    const hasBirthdayPassed =
+      todayMid.getMonth() > dob.getMonth() ||
+      (todayMid.getMonth() === dob.getMonth() && todayMid.getDate() >= dob.getDate());
+    if (!hasBirthdayPassed) {
+      age -= 1;
+    }
 
-    if (options?.minAge && age < options.minAge) return { minAge: { requiredAge: options.minAge, actualAge: age } };
-    if (options?.maxAge && age > options.maxAge) return { maxAge: { requiredAge: options.maxAge, actualAge: age } };
+    if (options?.minAge && age < options.minAge)
+      return { minAge: { requiredAge: options.minAge, actualAge: age } };
+    if (options?.maxAge && age > options.maxAge)
+      return { maxAge: { requiredAge: options.maxAge, actualAge: age } };
     return null;
   };
 }

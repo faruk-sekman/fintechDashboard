@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 describe('LoggerService', () => {
@@ -21,7 +25,7 @@ describe('LoggerService', () => {
   it('suppresses logs in production', async () => {
     vi.resetModules();
     vi.doMock('../../../environments/environment', () => ({
-      environment: { production: true, apiBaseUrl: '', defaultLanguage: 'tr' }
+      environment: { production: true, apiBaseUrl: '', defaultLanguage: 'tr' },
     }));
 
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);

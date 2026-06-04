@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect } from 'vitest';
 import { toHttpParams } from '@shared/utils/http-params.util';
 
@@ -12,7 +16,7 @@ describe('toHttpParams', () => {
       a: 'ok',
       b: '',
       c: null,
-      d: undefined
+      d: undefined,
     });
     expect(params.get('a')).toBe('ok');
     expect(params.get('b')).toBeNull();

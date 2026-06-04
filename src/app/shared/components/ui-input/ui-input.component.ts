@@ -1,5 +1,16 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -9,7 +20,7 @@ import { Subscription } from 'rxjs';
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './ui-input.component.html',
   styleUrl: './ui-input.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiInputComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) control!: FormControl;
@@ -58,7 +69,7 @@ export class UiInputComponent implements OnChanges, OnDestroy {
     };
 
     apply(this.control.value);
-    this.maskSub = this.control.valueChanges.subscribe((value) => apply(value));
+    this.maskSub = this.control.valueChanges.subscribe(value => apply(value));
   }
 
   private applyMask(value: string): string {

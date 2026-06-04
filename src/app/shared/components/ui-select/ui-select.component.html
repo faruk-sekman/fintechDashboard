@@ -4,7 +4,7 @@
     [ngClass]="inputClass"
     [attr.id]="id || null"
     [attr.readonly]="readOnly ? '' : null"
-    [attr.disabled]="disabled"
+    [attr.disabled]="disabled ? '' : null"
     [formControl]="control"
     [attr.aria-invalid]="ariaInvalid"
   >

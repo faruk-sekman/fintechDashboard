@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClientService } from '@core/api/api-client.service';
@@ -17,9 +21,15 @@ export interface ListTransactionsParams extends HttpParamsInput {
 
 @Injectable({ providedIn: 'root' })
 export class TransactionsApi {
-  constructor(private api: ApiClientService) {}
+  constructor(private readonly api: ApiClientService) {}
 
-  listByCustomerId(customerId: string, params: ListTransactionsParams): Observable<PaginatedResponse<Transaction>> {
-    return this.api.get<PaginatedResponse<Transaction>>(`/api/transactions/${encodeURIComponent(customerId)}`, params);
+  listByCustomerId(
+    customerId: string,
+    params: ListTransactionsParams,
+  ): Observable<PaginatedResponse<Transaction>> {
+    return this.api.get<PaginatedResponse<Transaction>>(
+      `/api/transactions/${encodeURIComponent(customerId)}`,
+      params,
+    );
   }
 }

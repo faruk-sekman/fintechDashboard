@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { HttpErrorResponse, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
@@ -17,8 +21,8 @@ describe('HTTP interceptors', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: LoadingService, useValue: loadingMock },
-        { provide: AppErrorService, useValue: appErrorMock }
-      ]
+        { provide: AppErrorService, useValue: appErrorMock },
+      ],
     });
   });
 
@@ -26,21 +30,19 @@ describe('HTTP interceptors', () => {
     const req = new HttpRequest('GET', '/test');
     const next = vi.fn(() => of(new HttpResponse({ status: 200 })));
 
-    await TestBed.runInInjectionContext(() =>
-      lastValueFrom(loadingInterceptor(req, next))
-    );
+    await TestBed.runInInjectionContext(() => lastValueFrom(loadingInterceptor(req, next)));
 
     expect(loadingMock.start).toHaveBeenCalled();
     expect(loadingMock.end).toHaveBeenCalled();
   });
 
   it('loadingInterceptor skips when header present', async () => {
-    const req = new HttpRequest('GET', '/test', undefined, { headers: new HttpHeaders({ 'x-skip-loading': '1' }) });
+    const req = new HttpRequest('GET', '/test', undefined, {
+      headers: new HttpHeaders({ 'x-skip-loading': '1' }),
+    });
     const next = vi.fn(() => of(new HttpResponse({ status: 200 })));
 
-    await TestBed.runInInjectionContext(() =>
-      lastValueFrom(loadingInterceptor(req, next))
-    );
+    await TestBed.runInInjectionContext(() => lastValueFrom(loadingInterceptor(req, next)));
 
     expect(loadingMock.start).not.toHaveBeenCalled();
   });
@@ -51,7 +53,7 @@ describe('HTTP interceptors', () => {
     const next = vi.fn(() => throwError(() => httpError));
 
     await expect(
-      TestBed.runInInjectionContext(() => lastValueFrom(errorInterceptor(req, next)))
+      TestBed.runInInjectionContext(() => lastValueFrom(errorInterceptor(req, next))),
     ).rejects.toBe(httpError);
 
     expect(appErrorMock.handleHttpError).toHaveBeenCalledWith(httpError, '/test');
@@ -63,7 +65,7 @@ describe('HTTP interceptors', () => {
     const next = vi.fn(() => throwError(() => httpError));
 
     await expect(
-      TestBed.runInInjectionContext(() => lastValueFrom(errorInterceptor(req, next)))
+      TestBed.runInInjectionContext(() => lastValueFrom(errorInterceptor(req, next))),
     ).rejects.toBe(httpError);
 
     expect(appErrorMock.handleHttpError).not.toHaveBeenCalled();

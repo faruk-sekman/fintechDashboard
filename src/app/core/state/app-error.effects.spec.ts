@@ -1,4 +1,9 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
+import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Actions } from '@ngrx/effects';
 import { Subject } from 'rxjs';
@@ -13,8 +18,8 @@ describe('AppErrorEffects', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: Actions, useValue: new Actions(actions$) },
-        { provide: AppErrorService, useValue: appError }
-      ]
+        { provide: AppErrorService, useValue: appError },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new AppErrorEffects());
@@ -23,7 +28,30 @@ describe('AppErrorEffects', () => {
     const error = new Error('fail');
     actions$.next({ type: '[Any] Failure', error });
 
-    expect(appError.handleError).toHaveBeenCalledWith(error, { source: 'NgRx', operation: '[Any] Failure' });
+    expect(appError.handleError).toHaveBeenCalledWith(error, {
+      source: 'NgRx',
+      operation: '[Any] Failure',
+    });
+
+    sub.unsubscribe();
+  });
+
+  it('skips HTTP failures (owned by errorInterceptor)', () => {
+    const actions$ = new Subject<any>();
+    const appError = { handleError: vi.fn() };
+
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: Actions, useValue: new Actions(actions$) },
+        { provide: AppErrorService, useValue: appError },
+      ],
+    });
+
+    const effects = TestBed.runInInjectionContext(() => new AppErrorEffects());
+    const sub = effects.notifyFailures$.subscribe();
+
+    actions$.next({ type: '[Any] Failure', error: new HttpErrorResponse({ status: 500 }) });
+    expect(appError.handleError).not.toHaveBeenCalled();
 
     sub.unsubscribe();
   });
@@ -35,8 +63,8 @@ describe('AppErrorEffects', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: Actions, useValue: new Actions(actions$) },
-        { provide: AppErrorService, useValue: appError }
-      ]
+        { provide: AppErrorService, useValue: appError },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new AppErrorEffects());
@@ -56,8 +84,8 @@ describe('AppErrorEffects', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: Actions, useValue: new Actions(actions$) },
-        { provide: AppErrorService, useValue: appError }
-      ]
+        { provide: AppErrorService, useValue: appError },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new AppErrorEffects());

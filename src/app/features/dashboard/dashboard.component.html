@@ -7,7 +7,7 @@
   </div>
 
   @if (summaryVm$ | async; as vm) {
-    @let loading = (customersLoading$ | async);
+    @let loading = customersLoading$ | async;
     <div class="grid gap-3 motion-stagger sm:grid-cols-2 xl:grid-cols-4">
       <div class="card kpi-card stat-card kpi-card--slate">
         <div class="metric-label metric-label--icon">
@@ -31,7 +31,7 @@
           <ng-container [ngTemplateOutlet]="kpiMetaSkeleton"></ng-container>
         }
       </div>
-<div class="card kpi-card kpi-card--emerald">
+      <div class="card kpi-card kpi-card--emerald">
         <div class="metric-label metric-label--icon">
           <i class="ri-line-chart-line" aria-hidden="true"></i>
           <span>{{ 'dashboard.kpi.activeRate' | translate }}</span>
@@ -136,7 +136,9 @@
           <span>{{ 'dashboard.kpi.userCards' | translate }}</span>
         </div>
         @if (!loading) {
-          <div class="user-grid motion-stagger grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
+          <div
+            class="user-grid motion-stagger grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2"
+          >
             @for (user of internalUsers; track user.username) {
               <div class="user-card flex flex-col sm:flex-row">
                 <div class="user-avatar" aria-hidden="true">
@@ -154,8 +156,13 @@
                     <span>{{ user.location }}</span>
                   </div>
                 </div>
-                <div class="user-side items-start justify-items-start sm:items-end sm:justify-items-end">
-                  <app-ui-badge [text]="user.role" [color]="user.role === 'Admin' ? 'blue' : 'purple'"></app-ui-badge>
+                <div
+                  class="user-side items-start justify-items-start sm:items-end sm:justify-items-end"
+                >
+                  <app-ui-badge
+                    [text]="user.role"
+                    [color]="user.role === 'Admin' ? 'blue' : 'purple'"
+                  ></app-ui-badge>
                   <div class="user-status" [class.user-status--offline]="user.status !== 'Online'">
                     <span class="user-dot" aria-hidden="true"></span>
                     <span>{{ user.status }}</span>
@@ -176,8 +183,8 @@
           <span>{{ 'dashboard.kpi.latestUpdated' | translate }}</span>
         </div>
         @if (latestCustomerSummary$ | async; as latestDetail) {
-          @let latestLoading = (latestLoading$ | async);
-          @let latestLoaded = (latestLoaded$ | async);
+          @let latestLoading = latestLoading$ | async;
+          @let latestLoaded = latestLoaded$ | async;
           @if (latestLoading) {
             <ng-container [ngTemplateOutlet]="latestSkeleton"></ng-container>
           } @else if (latestDetail.customer) {
@@ -190,7 +197,9 @@
                   <div class="person-name">{{ latestDetail.customer.name }}</div>
                   <div class="person-sub">{{ latestDetail.customer.dateOfBirth }}</div>
                 </div>
-                <app-customer-status-badge [status]="latestDetail.customer.kycStatus"></app-customer-status-badge>
+                <app-customer-status-badge
+                  [status]="latestDetail.customer.kycStatus"
+                ></app-customer-status-badge>
               </div>
 
               <div class="person-list">
@@ -214,7 +223,7 @@
                   <div class="person-item">
                     <i class="ri-wallet-3-line person-icon" aria-hidden="true"></i>
                     <span class="person-text person-balance">
-                      {{ wallet.balance | number:'1.2-2' }} {{ wallet.currency }}
+                      {{ wallet.balance | number: '1.2-2' }} {{ wallet.currency }}
                     </span>
                   </div>
                 }
@@ -292,17 +301,29 @@
 
   <ng-template #userSkeleton>
     <div class="user-grid grid grid-cols-1 gap-2 sm:grid-cols-2">
-      @for (item of [1,2,3,4]; track item) {
+      @for (item of [1, 2, 3, 4]; track item) {
         <div class="user-skeleton flex flex-col sm:flex-row">
-          <app-ui-skeleton variant="block" width="40px" height="40px" radius="12px"></app-ui-skeleton>
+          <app-ui-skeleton
+            variant="block"
+            width="40px"
+            height="40px"
+            radius="12px"
+          ></app-ui-skeleton>
           <div class="user-skeleton-info">
             <app-ui-skeleton variant="line" width="100px" height="14px"></app-ui-skeleton>
             <app-ui-skeleton variant="line" width="90px" height="12px"></app-ui-skeleton>
             <app-ui-skeleton variant="line" width="120px" height="12px"></app-ui-skeleton>
             <app-ui-skeleton variant="line" width="90px" height="12px"></app-ui-skeleton>
           </div>
-          <div class="user-skeleton-side items-start justify-items-start sm:items-end sm:justify-items-end">
-            <app-ui-skeleton variant="line" width="70px" height="18px" radius="999px"></app-ui-skeleton>
+          <div
+            class="user-skeleton-side items-start justify-items-start sm:items-end sm:justify-items-end"
+          >
+            <app-ui-skeleton
+              variant="line"
+              width="70px"
+              height="18px"
+              radius="999px"
+            ></app-ui-skeleton>
             <app-ui-skeleton variant="line" width="70px" height="12px"></app-ui-skeleton>
           </div>
         </div>

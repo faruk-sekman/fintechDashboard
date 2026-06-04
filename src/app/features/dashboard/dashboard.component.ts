@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -11,8 +15,7 @@ import { UiSkeletonComponent } from '@shared/components/ui-skeleton/ui-skeleton.
 import { CountUpDirective } from '@shared/directives/count-up.directive';
 import { KYC_STATUS_ORDER } from '@shared/utils/kyc-status';
 import { CustomerStatusBadgeComponent } from '@features/customers/components/customer-status-badge/customer-status-badge.component';
-import { CustomersStore } from '@features/customers/state';
-import { LatestCustomerStore } from '@features/dashboard/state';
+import { DashboardStatsStore, LatestCustomerStore } from '@features/dashboard/state';
 
 interface DashboardViewModel {
   total: number;
@@ -31,12 +34,20 @@ interface DashboardViewModel {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule, UiBadgeComponent, UiSkeletonComponent, CustomerStatusBadgeComponent, CountUpDirective],
+  imports: [
+    CommonModule,
+    RouterLink,
+    TranslateModule,
+    UiBadgeComponent,
+    UiSkeletonComponent,
+    CustomerStatusBadgeComponent,
+    CountUpDirective,
+  ],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+  styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  private readonly customersStore = inject(CustomersStore);
+  private readonly statsStore = inject(DashboardStatsStore);
   private readonly latestCustomerStore = inject(LatestCustomerStore);
   private readonly kycStatusOrder: KycStatus[] = KYC_STATUS_ORDER;
   private readonly destroy$ = new Subject<void>();
@@ -49,7 +60,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       email: 'faruk@company.local',
       location: 'Istanbul, TR',
       role: 'Admin',
-      status: 'Online'
+      status: 'Online',
     },
     {
       initials: 'MK',
@@ -58,7 +69,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       email: 'merve@company.local',
       location: 'Ankara, TR',
       role: 'Admin',
-      status: 'Passive'
+      status: 'Passive',
     },
     {
       initials: 'AA',
@@ -67,7 +78,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       email: 'ahmet@company.local',
       location: 'Izmir, TR',
       role: 'User',
-      status: 'Passive'
+      status: 'Passive',
     },
     {
       initials: 'KO',
@@ -76,37 +87,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
       email: 'kaan@company.local',
       location: 'Bursa, TR',
       role: 'User',
-      status: 'Passive'
-    }
+      status: 'Passive',
+    },
   ];
 
-  readonly customers$ = this.customersStore.data$;
-  readonly customersTotal$ = this.customersStore.total$;
-  readonly customersLoading$ = this.customersStore.loading$;
+  readonly customers$ = this.statsStore.data$;
+  readonly customersTotal$ = this.statsStore.total$;
+  readonly customersLoading$ = this.statsStore.loading$;
 
   readonly latestCustomer$ = this.latestCustomerStore.customer$;
   readonly latestWallet$ = this.latestCustomerStore.wallet$;
   readonly latestLoading$ = this.latestCustomerStore.loading$;
   readonly latestLoaded$ = this.latestCustomerStore.loaded$;
   readonly latestCustomerSummary$ = combineLatest([this.latestCustomer$, this.latestWallet$]).pipe(
-    map(([customer, wallet]) => ({ customer, wallet }))
+    map(([customer, wallet]) => ({ customer, wallet })),
   );
 
   readonly summaryVm$ = combineLatest([this.customers$, this.customersTotal$]).pipe(
     map(([customers, total]) => {
       const customerList: Customer[] = customers ?? [];
-      const totalCount = total > 0 ? total : customerList.length;
-      const activeCount = customerList.filter((c) => c.isActive).length;
+      const totalCount = this.resolveTotalCount(total, customerList.length);
+      const activeCount = customerList.filter(c => c.isActive).length;
       const inactiveCount = Math.max(totalCount - activeCount, 0);
-      const activeRate = totalCount > 0 ? Math.round((activeCount / totalCount) * 100) : 0;
-      const inactiveRate = totalCount > 0 ? Math.round((inactiveCount / totalCount) * 100) : 0;
+      const activeRate = this.percentOf(activeCount, totalCount);
+      const inactiveRate = this.percentOf(inactiveCount, totalCount);
       const kycCounts = this.countByKycStatus(customerList);
       const kycTotal = Object.values(kycCounts).reduce((sum, value) => sum + value, 0);
-      const kycPercents = this.kycStatusOrder.reduce<Record<KycStatus, number>>((acc, status) => {
-        const count = kycCounts[status] ?? 0;
-        acc[status] = kycTotal > 0 ? Math.round((count / kycTotal) * 100) : 0;
-        return acc;
-      }, { UNKNOWN: 0, UNVERIFIED: 0, VERIFIED: 0, CONTRACTED: 0 });
+      const kycPercents = this.kycStatusOrder.reduce<Record<KycStatus, number>>(
+        (acc, status) => {
+          const count = kycCounts[status] ?? 0;
+          acc[status] = this.percentOf(count, kycTotal);
+          return acc;
+        },
+        { UNKNOWN: 0, UNVERIFIED: 0, VERIFIED: 0, CONTRACTED: 0 },
+      );
       const ageStats = this.computeAgeStats(customerList);
 
       return {
@@ -118,24 +132,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
         avgAge: ageStats.avg,
         minAge: ageStats.min,
         maxAge: ageStats.max,
-        kycList: this.kycStatusOrder.map((status) => ({ status, count: kycCounts[status] ?? 0 })),
+        kycList: this.kycStatusOrder.map(status => ({ status, count: kycCounts[status] ?? 0 })),
         kycPercents,
-        kycTotal
+        kycTotal,
       } satisfies DashboardViewModel;
-    })
+    }),
   );
 
   ngOnInit(): void {
-    this.customersStore.load({ page: 1, pageSize: 60 });
+    this.statsStore.load({ page: 1, pageSize: 60 });
 
     this.customers$
       .pipe(
-        map((customers) => this.findLatestUpdatedCustomer(customers ?? [])?.id ?? null),
+        map(customers => this.findLatestUpdatedCustomer(customers ?? [])?.id ?? null),
         distinctUntilChanged(),
         filter((id): id is string => !!id),
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
       )
-      .subscribe((id) => this.latestCustomerStore.load(id));
+      .subscribe(id => this.latestCustomerStore.load(id));
   }
 
   ngOnDestroy(): void {
@@ -148,7 +162,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       UNKNOWN: 0,
       UNVERIFIED: 0,
       VERIFIED: 0,
-      CONTRACTED: 0
+      CONTRACTED: 0,
     };
 
     for (const customer of customers) {
@@ -158,7 +172,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return base;
   }
 
-  private computeAgeStats(customers: Customer[]): { avg: number | null; min: number | null; max: number | null } {
+  private resolveTotalCount(total: number, fallback: number): number {
+    if (total > 0) return total;
+    return fallback;
+  }
+
+  private percentOf(value: number, total: number): number {
+    if (total <= 0) return 0;
+    return Math.round((value / total) * 100);
+  }
+
+  private computeAgeStats(customers: Customer[]): {
+    avg: number | null;
+    min: number | null;
+    max: number | null;
+  } {
     let sum = 0;
     let count = 0;
     let min = Number.POSITIVE_INFINITY;
@@ -180,7 +208,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return {
       avg: Math.round(sum / count),
       min,
-      max
+      max,
     };
   }
 
@@ -212,6 +240,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private toTimestampMs(value: string): number {
     const date = new Date(value);
     const ts = date.getTime();
-    return Number.isFinite(ts) ? ts : -1;
+    if (Number.isFinite(ts)) return ts;
+    return -1;
   }
 }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 export interface Wallet {
   customerId: string;
   currency: string;

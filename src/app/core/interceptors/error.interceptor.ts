@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError } from 'rxjs/operators';
@@ -16,6 +20,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         errorService.handleHttpError(err, req.url);
       }
       return throwError(() => err);
-    })
+    }),
   );
 };

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject, Subject, of } from 'rxjs';
@@ -5,7 +9,20 @@ import { convertToParamMap } from '@angular/router';
 import { CustomerListComponent } from './customer-list.component';
 import { CustomersStore } from '@features/customers/state';
 
-const customer = { id: '1', name: 'A', email: '', phone: '', walletNumber: '', nationalId: 0, dateOfBirth: '', address: { country: '', city: '', postalCode: '', line1: '' }, kycStatus: 'UNKNOWN', isActive: true, createdAt: '', updatedAt: '' } as any;
+const customer = {
+  id: '1',
+  name: 'A',
+  email: '',
+  phone: '',
+  walletNumber: '',
+  nationalId: 0,
+  dateOfBirth: '',
+  address: { country: '', city: '', postalCode: '', line1: '' },
+  kycStatus: 'UNKNOWN',
+  isActive: true,
+  createdAt: '',
+  updatedAt: '',
+} as any;
 
 describe('CustomerListComponent', () => {
   const query$ = new BehaviorSubject(convertToParamMap({}));
@@ -18,7 +35,7 @@ describe('CustomerListComponent', () => {
     deletingId$: of(null),
     deleteSuccess$,
     load: vi.fn(),
-    delete: vi.fn()
+    delete: vi.fn(),
   };
   const routerMock = { navigate: vi.fn() };
   const routeMock = { queryParamMap: query$ };
@@ -27,15 +44,13 @@ describe('CustomerListComponent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     TestBed.configureTestingModule({
-      providers: [
-        { provide: CustomersStore, useValue: storeMock }
-      ]
+      providers: [{ provide: CustomersStore, useValue: storeMock }],
     });
   });
 
   it('loads customers based on query params', () => {
     const component = TestBed.runInInjectionContext(
-      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any)
+      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any),
     );
     component.ngOnInit();
 
@@ -46,7 +61,7 @@ describe('CustomerListComponent', () => {
 
   it('open/close delete modal and confirm deletion', () => {
     const component = TestBed.runInInjectionContext(
-      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any)
+      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any),
     );
 
     component.openDelete(customer);
@@ -61,7 +76,7 @@ describe('CustomerListComponent', () => {
 
   it('updates query params on page change and clear filters', () => {
     const component = TestBed.runInInjectionContext(
-      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any)
+      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any),
     );
 
     component.onPageChange({ page: 3, pageSize: 10 });
@@ -73,7 +88,7 @@ describe('CustomerListComponent', () => {
 
   it('navigates to create and detail', () => {
     const component = TestBed.runInInjectionContext(
-      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any)
+      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any),
     );
     component.create();
     component.open(customer);
@@ -83,7 +98,7 @@ describe('CustomerListComponent', () => {
 
   it('computes hasActiveFilters', () => {
     const component = TestBed.runInInjectionContext(
-      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any)
+      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any),
     );
 
     expect(component.hasActiveFilters).toBe(false);
@@ -93,7 +108,7 @@ describe('CustomerListComponent', () => {
 
   it('closes delete modal on delete success', () => {
     const component = TestBed.runInInjectionContext(
-      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any)
+      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any),
     );
     component.ngOnInit();
     component.openDelete(customer);
@@ -105,7 +120,7 @@ describe('CustomerListComponent', () => {
   it('updates query params from filter controls and cleans up', () => {
     vi.useFakeTimers();
     const component = TestBed.runInInjectionContext(
-      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any)
+      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any),
     );
     component.ngOnInit();
 
@@ -131,17 +146,15 @@ describe('CustomerListComponent', () => {
       deletingId$,
       deleteSuccess$: deleteSuccess$Local,
       load: vi.fn(),
-      delete: vi.fn()
+      delete: vi.fn(),
     };
 
     TestBed.configureTestingModule({
-      providers: [
-        { provide: CustomersStore, useValue: store }
-      ]
+      providers: [{ provide: CustomersStore, useValue: store }],
     });
 
     const component = TestBed.runInInjectionContext(
-      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any)
+      () => new CustomerListComponent(routerMock as any, routeMock as any, i18nMock as any),
     );
 
     expect(component.columns[6].formatter?.(true as any, customer)).toBe('common.yes');
@@ -152,7 +165,7 @@ describe('CustomerListComponent', () => {
     }
 
     const results: boolean[] = [];
-    const sub = component.deletingTarget$.subscribe((value) => results.push(value));
+    const sub = component.deletingTarget$.subscribe(value => results.push(value));
     component.openDelete(customer);
     deleting$.next(true);
     deletingId$.next('1');

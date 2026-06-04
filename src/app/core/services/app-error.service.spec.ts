@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppErrorService } from '@core/services/app-error.service';
@@ -71,16 +75,6 @@ describe('AppErrorService', () => {
     service.handleUnknownError(new Error('oops'));
     expect(logger.error).toHaveBeenCalled();
     expect(toast.error).toHaveBeenCalledWith('errors.unknown');
-  });
-
-  it('notify emits custom message without crashing', () => {
-    const toast = new ToastMock();
-    const logger = new LoggerMock();
-    const i18n = new TranslateMock();
-    const service = new AppErrorService(toast as any, logger as any, i18n as any);
-
-    service.notify('errors.custom', { silent: true });
-    expect(toast.error).not.toHaveBeenCalled();
   });
 
   it('handleError delegates http errors', () => {

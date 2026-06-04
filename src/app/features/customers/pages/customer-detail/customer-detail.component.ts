@@ -1,10 +1,35 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormControl, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EMPTY, Subject, combineLatest, merge } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, exhaustMap, filter, finalize, map, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  exhaustMap,
+  filter,
+  finalize,
+  map,
+  shareReplay,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 
 import { CustomersApi } from '@core/api/customers.api';
 import { WalletsApi } from '@core/api/wallets.api';
@@ -39,49 +64,60 @@ import { TransactionsStore, CustomersStore } from '@features/customers/state';
     UiSkeletonComponent,
     CustomerStatusBadgeComponent,
     UiConfirmDialogComponent,
-    CountUpDirective
+    CountUpDirective,
   ],
   templateUrl: './customer-detail.component.html',
-  styleUrl: './customer-detail.component.scss'
+  styleUrl: './customer-detail.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('limitsFormRef') limitsForm?: UiFormComponent;
   @ViewChild('txFiltersFormRef') txFiltersForm?: UiFormComponent;
-  private destroy$ = new Subject<void>();
-  private saveLimits$ = new Subject<void>();
-  private txReload$ = new Subject<void>();
-  private customersStore = inject(CustomersStore);
-  private transactionsStore = inject(TransactionsStore);
+  private readonly destroy$ = new Subject<void>();
+  private readonly saveLimits$ = new Subject<void>();
+  private readonly txReload$ = new Subject<void>();
+  private readonly customersStore = inject(CustomersStore);
+  private readonly transactionsStore = inject(TransactionsStore);
   id!: string;
 
-  customer: Customer | null = null;
-  wallet: Wallet | null = null;
+  readonly customer = signal<Customer | null>(null);
+  readonly wallet = signal<Wallet | null>(null);
 
-  loadingCustomer = true;
-  loadingWallet = true;
+  readonly loadingCustomer = signal(true);
+  readonly loadingWallet = signal(true);
 
-  deleteModalOpen = false;
-  deletingCustomer = false;
+  readonly deleteModalOpen = signal(false);
+  readonly deletingCustomer = signal(false);
 
-  limitsInitialValue: Record<string, unknown> | null = null;
+  readonly limitsInitialValue = signal<Record<string, unknown> | null>(null);
 
   limitFields: FieldConfig[] = [
-    { name: 'dailyLimit', labelKey: 'wallet.dailyLimit', type: 'number', validators: [Validators.required, Validators.min(1)] },
-    { name: 'monthlyLimit', labelKey: 'wallet.monthlyLimit', type: 'number', validators: [Validators.required, Validators.min(1)] }
+    {
+      name: 'dailyLimit',
+      labelKey: 'wallet.dailyLimit',
+      type: 'number',
+      validators: [Validators.required, Validators.min(1)],
+    },
+    {
+      name: 'monthlyLimit',
+      labelKey: 'wallet.monthlyLimit',
+      type: 'number',
+      validators: [Validators.required, Validators.min(1)],
+    },
   ];
   limitFormValidators = [walletLimitsConsistencyValidator('dailyLimit', 'monthlyLimit')];
 
-  savingLimits = false;
+  readonly savingLimits = signal(false);
 
-  txFilterInitialValue: Record<string, unknown> = {};
+  readonly txFilterInitialValue = signal<Record<string, unknown>>({});
 
-  txPage = 1;
-  txPageSize = 10;
+  readonly txPage = signal(1);
+  readonly txPageSize = signal(10);
 
   txData$ = this.transactionsStore.data$;
   txTotal$ = this.transactionsStore.total$;
   loadingTx$ = this.transactionsStore.loading$;
-  showTxSkeleton = true;
+  readonly showTxSkeleton = signal(true);
   private txLoadStarted = false;
 
   txColumns: ColumnDef<Transaction>[] = [
@@ -90,193 +126,236 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
       key: 'type',
       headerKey: 'transactions.type',
       type: 'badge',
-      badgeIcon: (value) => {
+      badgeIcon: value => {
         if (value === 'CREDIT') return 'ri-bank-card-2-line';
         if (value === 'DEBIT') return 'ri-bank-card-line';
         return null;
       },
-      badgeColor: (value) => {
+      badgeColor: value => {
         if (value === 'CREDIT') return 'indigo';
         if (value === 'DEBIT') return 'blue';
         return 'gray';
-      }
+      },
     },
     {
       key: 'transferDirection',
       headerKey: 'transactions.direction',
       type: 'badge',
-      badgeIcon: (value) => {
+      badgeIcon: value => {
         if (value === 'INCOMING') return 'ri-arrow-down-line';
         if (value === 'OUTGOING') return 'ri-arrow-up-line';
         return null;
       },
-      badgeColor: (value) => {
+      badgeColor: value => {
         if (value === 'INCOMING') return 'purple';
         if (value === 'OUTGOING') return 'pink';
         return 'gray';
-      }
+      },
     },
     { key: 'amount', headerKey: 'transactions.amount', type: 'currency', widthClass: 'w-[170px]' },
-    { key: 'description', headerKey: 'transactions.description' }
+    { key: 'description', headerKey: 'transactions.description' },
   ];
 
   txTypeOptions: SelectOption[] = [
     { labelKey: 'common.all', value: '' },
     { labelKey: 'DEBIT', value: 'DEBIT' },
-    { labelKey: 'CREDIT', value: 'CREDIT' }
+    { labelKey: 'CREDIT', value: 'CREDIT' },
   ];
 
   txDirectionOptions: SelectOption[] = [
     { labelKey: 'common.all', value: '' },
     { labelKey: 'INCOMING', value: 'INCOMING' },
-    { labelKey: 'OUTGOING', value: 'OUTGOING' }
+    { labelKey: 'OUTGOING', value: 'OUTGOING' },
   ];
 
   txCurrencyOptions: SelectOption[] = [
     { labelKey: 'common.all', value: '' },
     { labelKey: 'TRY', value: 'TRY' },
     { labelKey: 'USD', value: 'USD' },
-    { labelKey: 'EUR', value: 'EUR' }
+    { labelKey: 'EUR', value: 'EUR' },
   ];
 
   txFilterFields: FieldConfig[] = [
     { name: 'type', labelKey: 'transactions.type', type: 'select', options: this.txTypeOptions },
-    { name: 'direction', labelKey: 'transactions.direction', type: 'select', options: this.txDirectionOptions },
-    { name: 'currency', labelKey: 'transactions.currency', type: 'select', options: this.txCurrencyOptions },
+    {
+      name: 'direction',
+      labelKey: 'transactions.direction',
+      type: 'select',
+      options: this.txDirectionOptions,
+    },
+    {
+      name: 'currency',
+      labelKey: 'transactions.currency',
+      type: 'select',
+      options: this.txCurrencyOptions,
+    },
     { name: 'from', labelKey: 'transactions.from', type: 'datetime-local' },
-    { name: 'to', labelKey: 'transactions.to', type: 'datetime-local', fieldClass: 'wide' }
+    { name: 'to', labelKey: 'transactions.to', type: 'datetime-local', fieldClass: 'wide' },
   ];
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private customersApi: CustomersApi,
-    private walletsApi: WalletsApi,
-    private toast: ToastService,
-    private appError: AppErrorService,
-    private i18n: TranslateService
-  ) { }
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly customersApi: CustomersApi,
+    private readonly walletsApi: WalletsApi,
+    private readonly toast: ToastService,
+    private readonly appError: AppErrorService,
+    private readonly i18n: TranslateService,
+  ) {}
 
   ngOnInit(): void {
-    this.txFilterInitialValue = this.buildTxFilterInitialValue();
+    this.txFilterInitialValue.set(this.buildTxFilterInitialValue());
 
     const id$ = this.route.paramMap.pipe(
-      map((params) => params.get('id')),
+      map(params => params.get('id')),
       filter((id): id is string => !!id),
       distinctUntilChanged(),
-      tap((id) => {
+      tap(id => {
         this.id = id;
-      })
+      }),
+      shareReplay({ bufferSize: 1, refCount: true }),
     );
 
-    id$.pipe(
-      tap(() => (this.loadingCustomer = true)),
-      switchMap((id) =>
-        this.customersApi.getById(id).pipe(
-          tap((c) => {
-            this.customer = c;
-          }),
-          catchError((err) => {
-            this.appError.handleError(err, { source: 'CustomerDetailComponent', operation: 'loadCustomer' });
+    // Transactions load from the route id (not ViewChild/form timing), so the panel
+    // always populates and reloads correctly whenever the customer id changes.
+    id$
+      .pipe(
+        tap(() => this.txPage.set(1)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => this.dispatchTransactionsLoad());
+
+    id$
+      .pipe(
+        tap(() => this.loadingCustomer.set(true)),
+        switchMap(id =>
+          this.customersApi.getById(id).pipe(
+            tap(c => {
+              this.customer.set(c);
+            }),
+            catchError(err => {
+              this.appError.handleError(err, {
+                source: 'CustomerDetailComponent',
+                operation: 'loadCustomer',
+              });
+              return EMPTY;
+            }),
+            finalize(() => {
+              this.loadingCustomer.set(false);
+            }),
+          ),
+        ),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
+
+    id$
+      .pipe(
+        tap(() => this.loadingWallet.set(true)),
+        switchMap(id =>
+          this.walletsApi.getByCustomerId(id).pipe(
+            tap(w => {
+              this.wallet.set(w);
+              this.limitsInitialValue.set({
+                dailyLimit: w.dailyLimit,
+                monthlyLimit: w.monthlyLimit,
+              });
+            }),
+            catchError(err => {
+              this.appError.handleError(err, {
+                source: 'CustomerDetailComponent',
+                operation: 'loadWallet',
+              });
+              return EMPTY;
+            }),
+            finalize(() => {
+              this.loadingWallet.set(false);
+            }),
+          ),
+        ),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
+
+    this.loadingTx$.pipe(takeUntil(this.destroy$)).subscribe(loading => {
+      if (loading) {
+        this.txLoadStarted = true;
+        this.showTxSkeleton.set(true);
+        return;
+      }
+      if (this.txLoadStarted) {
+        this.showTxSkeleton.set(false);
+      }
+    });
+
+    this.saveLimits$
+      .pipe(
+        exhaustMap(() => {
+          const form = this.limitsForm?.form;
+          if (!form) return EMPTY;
+          form.updateValueAndValidity({ emitEvent: false });
+          form.markAllAsTouched();
+          if (form.invalid) return EMPTY;
+
+          const value = form.getRawValue() as {
+            dailyLimit?: number | null;
+            monthlyLimit?: number | null;
+          };
+          const dailyLimit = Number(value.dailyLimit);
+          const monthlyLimit = Number(value.monthlyLimit);
+          if (
+            Number.isFinite(dailyLimit) &&
+            Number.isFinite(monthlyLimit) &&
+            dailyLimit >= monthlyLimit
+          ) {
+            form.setErrors({ ...(form.errors ?? {}), limitMismatch: true });
             return EMPTY;
-          }),
-          finalize(() => {
-            this.loadingCustomer = false;
-          })
-        )
-      ),
-      takeUntil(this.destroy$)
-    ).subscribe();
+          } else if (form.errors?.['limitMismatch']) {
+            const { limitMismatch, ...rest } = form.errors as Record<string, unknown>;
+            this.setRemainingErrors(form, rest);
+          }
 
-    id$.pipe(
-      tap(() => (this.loadingWallet = true)),
-      switchMap((id) =>
-        this.walletsApi.getByCustomerId(id).pipe(
-          tap((w) => {
-            this.wallet = w;
-            this.limitsInitialValue = { dailyLimit: w.dailyLimit, monthlyLimit: w.monthlyLimit };
-          }),
-          catchError((err) => {
-            this.appError.handleError(err, { source: 'CustomerDetailComponent', operation: 'loadWallet' });
-            return EMPTY;
-          }),
-          finalize(() => {
-            this.loadingWallet = false;
-          })
-        )
-      ),
-      takeUntil(this.destroy$)
-    ).subscribe();
+          const payload = { dailyLimit, monthlyLimit };
+          this.savingLimits.set(true);
+          return this.walletsApi.updateLimits(this.id, payload).pipe(
+            tap(w => {
+              this.wallet.set(w);
+              this.limitsInitialValue.set({
+                dailyLimit: w.dailyLimit,
+                monthlyLimit: w.monthlyLimit,
+              });
+              this.toast.success(this.i18n.instant('wallet.updated'));
+              form.reset(this.limitsInitialValue, { emitEvent: false });
+              form.markAsPristine();
+              form.markAsUntouched();
+              form.updateValueAndValidity({ emitEvent: false });
+            }),
+            catchError(err => {
+              this.appError.handleError(err, {
+                source: 'CustomerDetailComponent',
+                operation: 'updateLimits',
+              });
+              return EMPTY;
+            }),
+            finalize(() => {
+              this.savingLimits.set(false);
+            }),
+          );
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
 
-    this.loadingTx$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((loading) => {
-        if (loading) {
-          this.txLoadStarted = true;
-          this.showTxSkeleton = true;
-          return;
-        }
-        if (this.txLoadStarted) {
-          this.showTxSkeleton = false;
-        }
-      });
-
-    this.saveLimits$.pipe(
-      exhaustMap(() => {
-        const form = this.limitsForm?.form;
-        if (!form) return EMPTY;
-        form.updateValueAndValidity({ emitEvent: false });
-        form.markAllAsTouched();
-        if (form.invalid) return EMPTY;
-
-        const value = form.getRawValue() as { dailyLimit?: number | null; monthlyLimit?: number | null };
-        const dailyLimit = Number(value.dailyLimit);
-        const monthlyLimit = Number(value.monthlyLimit);
-        if (Number.isFinite(dailyLimit) && Number.isFinite(monthlyLimit) && dailyLimit >= monthlyLimit) {
-          form.setErrors({ ...(form.errors ?? {}), limitMismatch: true });
-          return EMPTY;
-        } else if (form.errors?.['limitMismatch']) {
-          const { limitMismatch, ...rest } = form.errors as Record<string, unknown>;
-          form.setErrors(Object.keys(rest).length ? rest : null);
-        }
-
-        const payload = { dailyLimit, monthlyLimit };
-        this.savingLimits = true;
-        return this.walletsApi.updateLimits(this.id, payload).pipe(
-          tap((w) => {
-            this.wallet = w;
-            this.limitsInitialValue = { dailyLimit: w.dailyLimit, monthlyLimit: w.monthlyLimit };
-            this.toast.success(this.i18n.instant('wallet.updated'));
-            form.reset(this.limitsInitialValue, { emitEvent: false });
-            form.markAsPristine();
-            form.markAsUntouched();
-            form.updateValueAndValidity({ emitEvent: false });
-          }),
-          catchError((err) => {
-            this.appError.handleError(err, { source: 'CustomerDetailComponent', operation: 'updateLimits' });
-            return EMPTY;
-          }),
-          finalize(() => {
-            this.savingLimits = false;
-          })
-        );
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe();
-
-    combineLatest([
-      this.customersStore.deleting$,
-      this.customersStore.deletingId$
-    ])
+    combineLatest([this.customersStore.deleting$, this.customersStore.deletingId$])
       .pipe(takeUntil(this.destroy$))
       .subscribe(([deleting, deletingId]) => {
-        this.deletingCustomer = deleting && deletingId === this.id;
+        this.deletingCustomer.set(deleting && deletingId === this.id);
       });
 
     this.customersStore.deleteSuccess$
       .pipe(
         filter(({ id }) => id === this.id),
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
       )
       .subscribe(() => {
         this.closeDelete();
@@ -293,20 +372,26 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
     this.destroy$.complete();
   }
 
-  back() { this.router.navigate(['/customers']); }
-  edit() { this.router.navigate(['/customers', this.id, 'edit']); }
-  web3Risk() { this.router.navigate(['/customers', this.id, 'web3-risk']); }
+  back() {
+    this.router.navigate(['/customers']);
+  }
+  edit() {
+    this.router.navigate(['/customers', this.id, 'edit']);
+  }
+  web3Risk() {
+    this.router.navigate(['/customers', this.id, 'web3-risk']);
+  }
 
   openDelete() {
-    this.deleteModalOpen = true;
+    this.deleteModalOpen.set(true);
   }
 
   closeDelete() {
-    this.deleteModalOpen = false;
+    this.deleteModalOpen.set(false);
   }
 
   confirmDelete() {
-    if (!this.id || this.deletingCustomer) return;
+    if (!this.id || this.deletingCustomer()) return;
     this.customersStore.delete(this.id);
   }
 
@@ -317,7 +402,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
   resetLimits() {
     const form = this.limitsForm?.form;
     if (!form) return;
-    const value = this.limitsInitialValue ?? { dailyLimit: null, monthlyLimit: null };
+    const value = this.currentLimitsInitialValue();
     form.reset(value, { emitEvent: false });
     form.markAsPristine();
     form.markAsUntouched();
@@ -325,8 +410,8 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   onTxPageChange(e: { page: number; pageSize: number }) {
-    this.txPage = e.page;
-    this.txPageSize = e.pageSize;
+    this.txPage.set(e.page);
+    this.txPageSize.set(e.pageSize);
     this.txReload$.next();
   }
 
@@ -336,9 +421,9 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
       this.txFiltersForm.form.reset(defaults, { emitEvent: false });
       this.txFiltersForm.form.markAsPristine();
     } else {
-      this.txFilterInitialValue = defaults;
+      this.txFilterInitialValue.set(defaults);
     }
-    this.txPage = 1;
+    this.txPage.set(1);
     this.txReload$.next();
   }
 
@@ -347,21 +432,18 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
     if (!form) return;
 
     const formChanges$ = form.valueChanges.pipe(
-      startWith(form.getRawValue()),
       debounceTime(250),
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-      tap(() => (this.txPage = 1)),
-      filter(() => this.syncTxRangeValidity())
+      tap(() => this.txPage.set(1)),
+      filter(() => this.syncTxRangeValidity()),
     );
 
-    const manualReload$ = this.txReload$.pipe(
-      filter(() => this.syncTxRangeValidity())
-    );
+    const manualReload$ = this.txReload$.pipe(filter(() => this.syncTxRangeValidity()));
 
     merge(formChanges$, manualReload$)
       .pipe(
         tap(() => this.dispatchTransactionsLoad()),
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
       )
       .subscribe();
   }
@@ -380,7 +462,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
     const clearRange = (ctrl: FormControl) => {
       if (!ctrl.errors || !ctrl.errors['range']) return;
       const { range, ...rest } = ctrl.errors as Record<string, any>;
-      ctrl.setErrors(Object.keys(rest).length ? rest : null);
+      this.setRemainingErrors(ctrl, rest);
     };
 
     if (!from || !to) {
@@ -409,6 +491,21 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
     return true;
   }
 
+  private setRemainingErrors(
+    control: AbstractControl | null,
+    errors: Record<string, unknown>,
+  ): void {
+    if (Object.keys(errors).length) {
+      control?.setErrors(errors);
+      return;
+    }
+    control?.setErrors(null);
+  }
+
+  private currentLimitsInitialValue(): Record<string, unknown> {
+    return this.limitsInitialValue() ?? { dailyLimit: null, monthlyLimit: null };
+  }
+
   private buildTxFilterInitialValue() {
     const range = this.defaultTxRange();
     return {
@@ -416,7 +513,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
       direction: '',
       currency: '',
       from: range.from,
-      to: range.to
+      to: range.to,
     };
   }
 
@@ -426,7 +523,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
     from.setMonth(from.getMonth() - 12);
     return {
       from: this.toDateTimeLocal(from),
-      to: this.toDateTimeLocal(now)
+      to: this.toDateTimeLocal(now),
     };
   }
 
@@ -441,7 +538,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   private dispatchTransactionsLoad() {
-    const v = (this.txFiltersForm?.form?.getRawValue() ?? this.txFilterInitialValue) as {
+    const v = (this.txFiltersForm?.form?.getRawValue() ?? this.txFilterInitialValue()) as {
       type?: string;
       direction?: string;
       currency?: string;
@@ -450,13 +547,13 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
     } | null;
 
     const params: ListTransactionsParams = {
-      page: this.txPage,
-      pageSize: this.txPageSize,
+      page: this.txPage(),
+      pageSize: this.txPageSize(),
       type: ((v?.type ?? '') || undefined) as any,
       transferDirection: ((v?.direction ?? '') || undefined) as any,
       currency: (v?.currency ?? '') || undefined,
       from: (v?.from ?? '') || undefined,
-      to: (v?.to ?? '') || undefined
+      to: (v?.to ?? '') || undefined,
     };
 
     this.transactionsStore.load(this.id, params);

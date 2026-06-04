@@ -1,29 +1,37 @@
-import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { LatestCustomerState, latestCustomerFeatureKey } from '@features/dashboard/state/latest-customer.reducer';
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
 
-export const selectLatestCustomerState = createFeatureSelector<LatestCustomerState>(latestCustomerFeatureKey);
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import {
+  LatestCustomerState,
+  latestCustomerFeatureKey,
+} from '@features/dashboard/state/latest-customer.reducer';
+
+export const selectLatestCustomerState =
+  createFeatureSelector<LatestCustomerState>(latestCustomerFeatureKey);
 
 export const selectLatestCustomer = createSelector(
   selectLatestCustomerState,
-  (state) => state.customer
+  state => state.customer,
 );
 
 export const selectLatestCustomerWallet = createSelector(
   selectLatestCustomerState,
-  (state) => state.wallet
+  state => state.wallet,
 );
 
 export const selectLatestCustomerLoading = createSelector(
   selectLatestCustomerState,
-  (state) => state.loading
+  state => state.loading,
 );
 
 export const selectLatestCustomerLoaded = createSelector(
   selectLatestCustomerState,
-  (state) => state.loaded
+  state => state.loaded,
 );
 
 export const selectLatestCustomerError = createSelector(
   selectLatestCustomerState,
-  (state) => state.error
+  state => state.error,
 );

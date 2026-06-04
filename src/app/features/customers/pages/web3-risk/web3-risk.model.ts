@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { Eip1193Provider } from '@core/services/web3.service';
 
 /**

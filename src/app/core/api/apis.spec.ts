@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { CustomersApi } from '@core/api/customers.api';
 import { TransactionsApi } from '@core/api/transactions.api';

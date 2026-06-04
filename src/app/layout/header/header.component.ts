@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -10,15 +14,18 @@ import { ThemeService } from '@core/services/theme.service';
   standalone: true,
   imports: [CommonModule, TranslateModule],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrl: './header.component.scss',
 })
 export class HeaderComponent {
   @Output() menuToggle = new EventEmitter<void>();
   loading$: Observable<boolean>;
-  private themeService = inject(ThemeService);
+  private readonly themeService = inject(ThemeService);
   readonly theme = this.themeService.theme;
 
-  constructor(private i18n: TranslateService, private loading: LoadingService) {
+  constructor(
+    private readonly i18n: TranslateService,
+    private readonly loading: LoadingService,
+  ) {
     this.loading$ = this.loading.loading$;
   }
 
@@ -28,7 +35,8 @@ export class HeaderComponent {
   }
 
   currentLang(): 'en' | 'tr' {
-    return (this.i18n.currentLang as any) === 'tr' ? 'tr' : 'en';
+    if (this.i18n.currentLang === 'tr') return 'tr';
+    return 'en';
   }
 
   setTheme(mode: 'light' | 'dark') {

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 

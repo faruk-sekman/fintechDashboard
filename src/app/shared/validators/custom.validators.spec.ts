@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect } from 'vitest';
 import { FormControl, FormGroup } from '@angular/forms';
 import {
@@ -11,14 +15,14 @@ import {
   phoneNumberValidator,
   walletNumberValidator,
   strictEmailValidator,
-  dateOfBirthValidator
+  dateOfBirthValidator,
 } from '@shared/validators/custom.validators';
 
 describe('custom validators', () => {
   it('walletLimitsConsistencyValidator sets mismatch errors', () => {
     const form = new FormGroup({
       dailyLimit: new FormControl(100),
-      monthlyLimit: new FormControl(50)
+      monthlyLimit: new FormControl(50),
     });
     const validator = walletLimitsConsistencyValidator();
     const result = validator(form);
@@ -30,7 +34,7 @@ describe('custom validators', () => {
   it('walletLimitsConsistencyValidator clears mismatch when valid', () => {
     const form = new FormGroup({
       dailyLimit: new FormControl(10),
-      monthlyLimit: new FormControl(50)
+      monthlyLimit: new FormControl(50),
     });
     const validator = walletLimitsConsistencyValidator();
     const result = validator(form);
@@ -48,7 +52,7 @@ describe('custom validators', () => {
   it('walletLimitsConsistencyValidator skips non-numeric values', () => {
     const form = new FormGroup({
       dailyLimit: new FormControl('abc'),
-      monthlyLimit: new FormControl(100)
+      monthlyLimit: new FormControl(100),
     });
     const validator = walletLimitsConsistencyValidator();
     expect(validator(form)).toBeNull();
@@ -57,7 +61,7 @@ describe('custom validators', () => {
   it('walletLimitsConsistencyValidator respects blocking errors', () => {
     const form = new FormGroup({
       dailyLimit: new FormControl(10),
-      monthlyLimit: new FormControl(50)
+      monthlyLimit: new FormControl(50),
     });
     form.get('dailyLimit')?.setErrors({ required: true });
     const validator = walletLimitsConsistencyValidator();
@@ -69,7 +73,7 @@ describe('custom validators', () => {
   it('walletLimitsConsistencyValidator clears limitMismatch when values are empty', () => {
     const form = new FormGroup({
       dailyLimit: new FormControl(''),
-      monthlyLimit: new FormControl('')
+      monthlyLimit: new FormControl(''),
     });
     form.get('dailyLimit')?.setErrors({ limitMismatch: true, other: true });
     form.get('monthlyLimit')?.setErrors({ limitMismatch: true });
@@ -79,14 +83,17 @@ describe('custom validators', () => {
     expect(form.get('monthlyLimit')?.errors).toBeNull();
   });
 
-  it('turkishNationalIdValidator enforces digits, length, and leading zero', () => {
+  it('turkishNationalIdValidator enforces digits, length, leading zero, and checksum', () => {
     const validator = turkishNationalIdValidator();
     expect(validator(new FormControl(''))).toBeNull();
     expect(validator(new FormControl('0abc'))).toEqual({ nationalIdStartsWithZero: true });
     expect(validator(new FormControl('123'))).toEqual({ nationalIdLength: true });
     expect(validator(new FormControl('01234567890'))).toEqual({ nationalIdStartsWithZero: true });
     expect(validator(new FormControl('1234567890a'))).toEqual({ nationalIdNumeric: true });
-    expect(validator(new FormControl('12345678901'))).toBeNull();
+    // Correct length/format but invalid TC Kimlik checksum.
+    expect(validator(new FormControl('12345678901'))).toEqual({ nationalIdChecksum: true });
+    // Valid TC Kimlik No (passes both checksum digits).
+    expect(validator(new FormControl('10000000146'))).toBeNull();
   });
 
   it('trimmedRequiredValidator checks whitespace only', () => {

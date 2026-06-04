@@ -1,7 +1,16 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClientService } from '@core/api/api-client.service';
-import { Customer, CreateCustomerRequest, UpdateCustomerRequest, KycStatus } from '@shared/models/customer.model';
+import {
+  Customer,
+  CreateCustomerRequest,
+  UpdateCustomerRequest,
+  KycStatus,
+} from '@shared/models/customer.model';
 import { PaginatedResponse } from '@shared/models/pagination.model';
 import { HttpParamsInput } from '@shared/utils/http-params.util';
 
@@ -15,7 +24,7 @@ export interface ListCustomersParams extends HttpParamsInput {
 
 @Injectable({ providedIn: 'root' })
 export class CustomersApi {
-  constructor(private api: ApiClientService) {}
+  constructor(private readonly api: ApiClientService) {}
 
   list(params: ListCustomersParams): Observable<PaginatedResponse<Customer>> {
     return this.api.get<PaginatedResponse<Customer>>('/api/customers', params);

@@ -9,13 +9,24 @@
       @if (i > 0 && p - pages[i - 1] > 1) {
         <span class="ui-pagination__ellipsis">...</span>
       }
-      <app-ui-button size="sm" [variant]="page === p ? 'primary' : 'ghost'" type="button" (click)="goTo(p)">
+      <app-ui-button
+        size="sm"
+        [variant]="page === p ? 'primary' : 'ghost'"
+        type="button"
+        (click)="goTo(p)"
+      >
         {{ p }}
       </app-ui-button>
     }
   </div>
 
-  <app-ui-button size="sm" variant="ghost" type="button" (click)="next()" [disabled]="page >= totalPages">
+  <app-ui-button
+    size="sm"
+    variant="ghost"
+    type="button"
+    (click)="next()"
+    [disabled]="page >= totalPages"
+  >
     {{ 'common.next' | translate }}
     <i class="ri-arrow-right-s-line ui-button__icon" aria-hidden="true"></i>
   </app-ui-button>

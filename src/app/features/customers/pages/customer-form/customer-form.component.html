@@ -1,6 +1,6 @@
 <div class="page-shell">
   <div class="page-header items-center">
-    @if (loading && !initialValue) {
+    @if (loading() && !initialValue()) {
       <div>
         <app-ui-skeleton width="200px" height="30px"></app-ui-skeleton>
         <div class="mt-2">
@@ -11,7 +11,9 @@
     } @else {
       <div>
         <h1 class="page-title">
-          {{ mode === 'create' ? ('customers.create' | translate) : ('customers.edit' | translate) }}
+          {{
+            mode() === 'create' ? ('customers.create' | translate) : ('customers.edit' | translate)
+          }}
         </h1>
         <p class="page-subtitle">{{ 'customers.formSubtitle' | translate }}</p>
       </div>
@@ -24,9 +26,9 @@
   </div>
 
   <div class="card">
-    @if (loading && !initialValue) {
+    @if (loading() && !initialValue()) {
       <div class="form-skeleton grid grid-cols-1 gap-4 md:grid-cols-2">
-        @for (i of [1,2,3,4,5,6,7,8,9,10,11,12]; track i) {
+        @for (i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track i) {
           <div class="form-skeleton-field">
             <app-ui-skeleton height="12px" width="120px"></app-ui-skeleton>
             <app-ui-skeleton height="42px" radius="14px"></app-ui-skeleton>
@@ -40,10 +42,10 @@
     } @else {
       <app-ui-form
         #uiForm
-        [fields]="fields"
-        [initialValue]="initialValue"
-        [loading]="loading"
-        [submitLabelKey]="mode === 'create' ? 'customers.create' : 'common.save'"
+        [fields]="fields()"
+        [initialValue]="initialValue()"
+        [loading]="loading()"
+        [submitLabelKey]="mode() === 'create' ? 'customers.create' : 'common.save'"
         [showSubmit]="false"
         [formClass]="'grid grid-cols-2 gap-4 max-lg:grid-cols-1 motion-stagger'"
         (submitted)="onSubmit($event, uiForm)"
@@ -52,7 +54,7 @@
         <app-ui-button
           variant="ghost"
           type="button"
-          [disabled]="loading || !uiForm?.hasChanges"
+          [disabled]="loading() || !uiForm?.hasChanges"
           (click)="clearForm()"
         >
           <i class="ri-eraser-line ui-button__icon" aria-hidden="true"></i>
@@ -60,14 +62,20 @@
         </app-ui-button>
         <app-ui-button
           type="button"
-          [disabled]="loading || !uiForm?.form || (mode === 'edit' && (uiForm.form.invalid || !uiForm.hasChanges))"
+          [disabled]="
+            loading() ||
+            !uiForm?.form ||
+            (mode() === 'edit' && (uiForm.form.invalid || !uiForm.hasChanges))
+          "
           (click)="handleSubmit()"
         >
           <i class="ri-save-3-line ui-button__icon" aria-hidden="true"></i>
           {{
-            loading
+            loading()
               ? ('common.saving' | translate)
-              : (mode === 'create' ? ('customers.create' | translate) : ('common.save' | translate))
+              : mode() === 'create'
+                ? ('customers.create' | translate)
+                : ('common.save' | translate)
           }}
         </app-ui-button>
       </div>

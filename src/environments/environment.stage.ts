@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 export const environment = {
   production: false,
   apiBaseUrl: 'https://frontend-case-study.onrender.com',
@@ -9,6 +13,6 @@ export const environment = {
     chainName: 'Ethereum Mainnet',
     explorerBaseUrl: 'https://etherscan.io',
     // Empty -> "last seen tx" is simulated. Set a key to fetch a real txlist.
-    etherscanApiKey: ''
-  }
+    etherscanApiKey: '',
+  },
 };

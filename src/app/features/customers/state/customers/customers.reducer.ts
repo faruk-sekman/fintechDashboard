@@ -1,6 +1,17 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { createReducer, on } from '@ngrx/store';
 import { Customer } from '@shared/models/customer.model';
-import { deleteCustomer, deleteCustomerFailure, deleteCustomerSuccess, loadCustomers, loadCustomersFailure, loadCustomersSuccess } from '@features/customers/state/customers/customers.actions';
+import {
+  deleteCustomer,
+  deleteCustomerFailure,
+  deleteCustomerSuccess,
+  loadCustomers,
+  loadCustomersFailure,
+  loadCustomersSuccess,
+} from '@features/customers/state/customers/customers.actions';
 
 export const customersFeatureKey = 'customers';
 
@@ -21,46 +32,50 @@ export const initialState: CustomersState = {
   error: null,
   deleting: false,
   deletingId: null,
-  deleteError: null
+  deleteError: null,
 };
 
 export const customersReducer = createReducer(
   initialState,
-  on(loadCustomers, (state) => ({ ...state, loading: true, error: null })),
+  on(loadCustomers, state => ({ ...state, loading: true, error: null })),
   on(loadCustomersSuccess, (state, { data, total }) => ({
     ...state,
     data,
     total,
     loading: false,
-    error: null
+    error: null,
   })),
   on(loadCustomersFailure, (state, { error }) => ({
     ...state,
     loading: false,
-    error
+    error,
   })),
   on(deleteCustomer, (state, { id }) => ({
     ...state,
     deleting: true,
     deletingId: id,
-    deleteError: null
+    deleteError: null,
   })),
   on(deleteCustomerSuccess, (state, { id }) => {
-    const nextData = state.data.filter((item) => item.id !== id);
+    const nextData = state.data.filter(item => item.id !== id);
     const removed = nextData.length !== state.data.length;
+    let total = state.total;
+    if (removed) {
+      total = Math.max(0, state.total - 1);
+    }
     return {
       ...state,
       data: nextData,
-      total: removed ? Math.max(0, state.total - 1) : state.total,
+      total,
       deleting: false,
       deletingId: null,
-      deleteError: null
+      deleteError: null,
     };
   }),
   on(deleteCustomerFailure, (state, { error }) => ({
     ...state,
     deleting: false,
     deletingId: null,
-    deleteError: error
-  }))
+    deleteError: error,
+  })),
 );

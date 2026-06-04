@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { Injectable, signal } from '@angular/core';
 
 export type ThemeMode = 'light' | 'dark';
@@ -23,7 +27,11 @@ export class ThemeService {
   }
 
   toggleTheme() {
-    this.setTheme(this.themeSignal() === 'dark' ? 'light' : 'dark');
+    if (this.themeSignal() === 'dark') {
+      this.setTheme('light');
+      return;
+    }
+    this.setTheme('dark');
   }
 
   private readInitialTheme(): ThemeMode {
@@ -43,7 +51,8 @@ export class ThemeService {
     if (typeof window === 'undefined') return 'light';
     try {
       const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-      return prefersDark ? 'dark' : 'light';
+      if (prefersDark) return 'dark';
+      return 'light';
     } catch {
       return 'light';
     }

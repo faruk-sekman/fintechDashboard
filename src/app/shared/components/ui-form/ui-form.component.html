@@ -1,9 +1,15 @@
-<form class="ui-form" [ngClass]="formClass" [formGroup]="form" (ngSubmit)="onSubmit($event)" [attr.id]="id || null">
+<form
+  class="ui-form"
+  [ngClass]="formClass"
+  [formGroup]="form"
+  (ngSubmit)="onSubmit($event)"
+  [attr.id]="id || null"
+>
   @for (f of fields; track f.name; let i = $index) {
     <div class="ui-form__field" [ngClass]="f.fieldClass ?? null">
-        <label class="ui-form__label" [attr.for]="fieldId(f.name, i)">
-          {{ f.labelKey | translate }}
-        </label>
+      <label class="ui-form__label" [attr.for]="fieldId(f.name, i)">
+        {{ f.labelKey | translate }}
+      </label>
 
       @switch (f.type) {
         @case ('text') {
@@ -155,7 +161,6 @@
               [readOnly]="!!f.readOnly"
               [disabled]="!!f.disabled"
             />
-          
           </div>
         }
       }

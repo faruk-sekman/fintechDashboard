@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ThemeService } from '@core/services/theme.service';
 import { TestBed } from '@angular/core/testing';
@@ -17,20 +21,20 @@ describe('ThemeService', () => {
 
     expect(service.theme()).toBe('dark');
     service.setTheme('light');
-    await new Promise((r) => setTimeout(r, 0));
+    await new Promise(r => setTimeout(r, 0));
     expect(service.theme()).toBe('light');
     expect(localStorage.getItem('theme')).toBe('light');
   });
 
   it('uses system preference when storage is empty', () => {
-    vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: true } as any));
+    vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: true }) as any);
     const service = TestBed.runInInjectionContext(() => new ThemeService());
     expect(service.theme()).toBe('dark');
   });
 
   it('defaults to light when system preference is light', () => {
     vi.spyOn(window.localStorage, 'getItem').mockReturnValue(null);
-    vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: false } as any));
+    vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: false }) as any);
     const service = TestBed.runInInjectionContext(() => new ThemeService());
     expect(service.theme()).toBe('light');
   });
@@ -53,12 +57,12 @@ describe('ThemeService', () => {
   it('updates document attributes when theme changes', async () => {
     const service = TestBed.runInInjectionContext(() => new ThemeService());
     service.setTheme('dark');
-    await new Promise((r) => setTimeout(r, 0));
+    await new Promise(r => setTimeout(r, 0));
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
   });
 
   it('handles storage errors gracefully', () => {
-    vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: false } as any));
+    vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: false }) as any);
     const spy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('nope');
     });
@@ -98,13 +102,13 @@ describe('ThemeService', () => {
   });
 
   it('keeps theme in memory when persist fails', async () => {
-    vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: false } as any));
+    vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: false }) as any);
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('no storage');
     });
     const service = TestBed.runInInjectionContext(() => new ThemeService());
     service.setTheme('dark');
-    await new Promise((r) => setTimeout(r, 0));
+    await new Promise(r => setTimeout(r, 0));
     expect(service.theme()).toBe('dark');
   });
 });

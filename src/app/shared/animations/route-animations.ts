@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { animate, query, style, transition, trigger } from '@angular/animations';
 
 /**
@@ -18,10 +22,10 @@ export const routeFade = trigger('routeFade', [
         style({ opacity: 0, transform: 'translateY(8px)' }),
         animate(
           '300ms cubic-bezier(0.16, 1, 0.3, 1)',
-          style({ opacity: 1, transform: 'translateY(0)' })
-        )
+          style({ opacity: 1, transform: 'translateY(0)' }),
+        ),
       ],
-      { optional: true }
-    )
-  ])
+      { optional: true },
+    ),
+  ]),
 ]);

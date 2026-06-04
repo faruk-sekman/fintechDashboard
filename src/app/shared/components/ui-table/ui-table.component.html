@@ -1,17 +1,18 @@
 <div class="ui-table">
   <div class="ui-table__scroll">
-    <table class="ui-table__table" [ngClass]="loading ? 'table-fixed' : ''">
+    <table
+      class="ui-table__table"
+      [ngClass]="loading ? 'table-fixed' : ''"
+      [attr.aria-busy]="loading"
+    >
       <thead>
         <tr>
           @for (c of columns; track c.key) {
-            <th
-              class="ui-table__head"
-              [ngClass]="c.widthClass ?? ''"
-            >
+            <th scope="col" class="ui-table__head" [ngClass]="c.widthClass ?? ''">
               {{ c.headerKey | translate }}
             </th>
           }
-          <th class="ui-table__head">
+          <th scope="col" class="ui-table__head">
             {{ 'common.actions' | translate }}
           </th>
         </tr>
@@ -22,7 +23,7 @@
 
       @if (!loading) {
         <tbody class="motion-stagger motion-stagger--rise">
-          @for (row of data; track $index) {
+          @for (row of data; track trackRow(row, $index)) {
             <tr>
               @for (c of columns; track c.key) {
                 <td
@@ -34,14 +35,14 @@
                     <app-ui-badge
                       [text]="displayCell(c, row)"
                       [color]="badgeColor(c, row)"
-                      [badgeClass]="badgeClass(c, row)"
                       [icon]="badgeIcon(c, row)"
-                      [iconPosition]="badgeIconPosition(c, row)"
-                      [iconClass]="badgeIconClass(c, row)"
                     ></app-ui-badge>
                   } @else if (c.type === 'toggle') {
                     <div class="ui-table__toggle-wrap">
-                      <span class="ui-table__toggle" [class.ui-table__toggle--on]="toggleOn(c, row)">
+                      <span
+                        class="ui-table__toggle"
+                        [class.ui-table__toggle--on]="toggleOn(c, row)"
+                      >
                         <span class="ui-table__toggle-knob" aria-hidden="true"></span>
                       </span>
                       <span class="ui-table__toggle-label">{{ displayCell(c, row) }}</span>
@@ -58,7 +59,12 @@
                     [ngTemplateOutletContext]="{ $implicit: row }"
                   ></ng-container>
                 } @else {
-                  <app-ui-button size="sm" variant="ghost" type="button" (click)="rowAction.emit(row)">
+                  <app-ui-button
+                    size="sm"
+                    variant="ghost"
+                    type="button"
+                    (click)="rowAction.emit(row)"
+                  >
                     <i class="ri-eye-line ui-button__icon" aria-hidden="true"></i>
                     {{ rowActionLabelKey | translate }}
                   </app-ui-button>
@@ -77,21 +83,21 @@
         </tbody>
       } @else {
         <tbody>
-          @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
+          @for (i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track i) {
             <tr>
               @for (c of columns; track c.key) {
-              <td
-                class="ui-table__cell"
-                [ngClass]="c.widthClass ?? ''"
-                [attr.data-label]="c.headerKey | translate"
-              >
-                <div class="ui-table__skeleton ui-table__skeleton--line"></div>
+                <td
+                  class="ui-table__cell"
+                  [ngClass]="c.widthClass ?? ''"
+                  [attr.data-label]="c.headerKey | translate"
+                >
+                  <div class="ui-table__skeleton ui-table__skeleton--line"></div>
+                </td>
+              }
+              <td class="ui-table__cell" [attr.data-label]="'common.actions' | translate">
+                <div class="ui-table__skeleton ui-table__skeleton--button"></div>
               </td>
-            }
-            <td class="ui-table__cell" [attr.data-label]="'common.actions' | translate">
-              <div class="ui-table__skeleton ui-table__skeleton--button"></div>
-            </td>
-          </tr>
+            </tr>
           }
         </tbody>
       }
@@ -99,7 +105,9 @@
   </div>
 
   <div class="ui-table__footer">
-    <div class="ui-table__total">{{ 'common.total' | translate }}: <b>{{ total }}</b></div>
+    <div class="ui-table__total">
+      {{ 'common.total' | translate }}: <b>{{ total }}</b>
+    </div>
 
     <div class="ui-table__pager">
       <app-ui-pagination

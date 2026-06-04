@@ -2,7 +2,12 @@
   <div class="container grid mx-auto">
     <div class="header-row flex items-center justify-between py-3">
       <div class="left flex items-center gap-3">
-        <button type="button" class="icon-btn menu-toggle motion-pressable" (click)="menuToggle.emit()" aria-label="Menu">
+        <button
+          type="button"
+          class="icon-btn menu-toggle motion-pressable"
+          (click)="menuToggle.emit()"
+          aria-label="Menu"
+        >
           <i class="ri-menu-2-line" aria-hidden="true"></i>
         </button>
         <div class="logo">F</div>
@@ -13,23 +18,45 @@
       </div>
 
       <div class="right">
-        
         <div class="theme">
-          <button type="button" class="motion-pressable" [class.active]="theme() === 'light'" (click)="setTheme('light')">
+          <button
+            type="button"
+            class="motion-pressable"
+            [class.active]="theme() === 'light'"
+            (click)="setTheme('light')"
+          >
             <i class="ri-sun-line" aria-hidden="true"></i>
             <span class="label">{{ 'common.light' | translate }}</span>
           </button>
-          <button type="button" class="motion-pressable" [class.active]="theme() === 'dark'" (click)="setTheme('dark')">
+          <button
+            type="button"
+            class="motion-pressable"
+            [class.active]="theme() === 'dark'"
+            (click)="setTheme('dark')"
+          >
             <i class="ri-moon-line" aria-hidden="true"></i>
             <span class="label">{{ 'common.dark' | translate }}</span>
           </button>
         </div>
         <div class="lang">
-          <button type="button" class="motion-pressable" [class.active]="currentLang() === 'en'" (click)="switchLang('en')">EN</button>
-          <button type="button" class="motion-pressable" [class.active]="currentLang() === 'tr'" (click)="switchLang('tr')">TR</button>
+          <button
+            type="button"
+            class="motion-pressable"
+            [class.active]="currentLang() === 'en'"
+            (click)="switchLang('en')"
+          >
+            EN
+          </button>
+          <button
+            type="button"
+            class="motion-pressable"
+            [class.active]="currentLang() === 'tr'"
+            (click)="switchLang('tr')"
+          >
+            TR
+          </button>
         </div>
         <div class="actions">
-      
           <div class="user">
             <div class="avatar" aria-hidden="true">
               <i class="ri-user-3-line"></i>
@@ -39,14 +66,13 @@
               <div class="user-role">Admin</div>
             </div>
             <button type="button" class="icon-btn motion-pressable" aria-label="Notifications">
-            <i class="ri-notification-3-line" aria-hidden="true"></i>
-          </button>
+              <i class="ri-notification-3-line" aria-hidden="true"></i>
+            </button>
             <button type="button" class="icon-btn logout motion-pressable" aria-label="Logout">
               <i class="ri-logout-box-r-line" aria-hidden="true"></i>
             </button>
           </div>
         </div>
-
       </div>
     </div>
 

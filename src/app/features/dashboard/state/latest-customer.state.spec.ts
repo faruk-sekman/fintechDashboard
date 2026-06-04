@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Fintech Dashboard contributors.
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { Actions } from '@ngrx/effects';
@@ -8,19 +12,35 @@ import { LatestCustomerStore } from '@features/dashboard/state/latest-customer.s
 import {
   loadLatestCustomer,
   loadLatestCustomerFailure,
-  loadLatestCustomerSuccess
+  loadLatestCustomerSuccess,
 } from '@features/dashboard/state/latest-customer.actions';
-import { latestCustomerReducer, initialState } from '@features/dashboard/state/latest-customer.reducer';
+import {
+  latestCustomerReducer,
+  initialState,
+} from '@features/dashboard/state/latest-customer.reducer';
 import {
   selectLatestCustomer,
   selectLatestCustomerLoaded,
   selectLatestCustomerLoading,
-  selectLatestCustomerWallet
+  selectLatestCustomerWallet,
 } from '@features/dashboard/state/latest-customer.selectors';
 import { CustomersApi } from '@core/api/customers.api';
 import { WalletsApi } from '@core/api/wallets.api';
 
-const customer = { id: '1', name: 'A', email: '', phone: '', walletNumber: '', nationalId: 0, dateOfBirth: '2000-01-01', address: { country: '', city: '', postalCode: '', line1: '' }, kycStatus: 'UNKNOWN', isActive: true, createdAt: '', updatedAt: '' } as any;
+const customer = {
+  id: '1',
+  name: 'A',
+  email: '',
+  phone: '',
+  walletNumber: '',
+  nationalId: 0,
+  dateOfBirth: '2000-01-01',
+  address: { country: '', city: '', postalCode: '', line1: '' },
+  kycStatus: 'UNKNOWN',
+  isActive: true,
+  createdAt: '',
+  updatedAt: '',
+} as any;
 const wallet = { id: 'w', dailyLimit: 1, monthlyLimit: 2, balance: 0, currency: 'TRY' } as any;
 
 describe('LatestCustomer state', () => {
@@ -48,9 +68,7 @@ describe('LatestCustomer state', () => {
   it('LatestCustomerStore dispatches load', () => {
     const storeMock = { select: vi.fn(() => of(null)), dispatch: vi.fn() };
     TestBed.configureTestingModule({
-      providers: [
-        { provide: Store, useValue: storeMock }
-      ]
+      providers: [{ provide: Store, useValue: storeMock }],
     });
 
     const store = TestBed.runInInjectionContext(() => new LatestCustomerStore());
@@ -67,13 +85,13 @@ describe('LatestCustomer state', () => {
       providers: [
         { provide: Actions, useValue: new Actions(actions$) },
         { provide: CustomersApi, useValue: customersApi },
-        { provide: WalletsApi, useValue: walletsApi }
-      ]
+        { provide: WalletsApi, useValue: walletsApi },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new LatestCustomerEffects());
     const results: any[] = [];
-    const sub = effects.load$.subscribe((a) => results.push(a));
+    const sub = effects.load$.subscribe(a => results.push(a));
 
     actions$.next(loadLatestCustomer({ id: '1' }));
     expect(results[0].type).toBe(loadLatestCustomerSuccess.type);
@@ -90,13 +108,13 @@ describe('LatestCustomer state', () => {
       providers: [
         { provide: Actions, useValue: new Actions(actions$) },
         { provide: CustomersApi, useValue: customersApi },
-        { provide: WalletsApi, useValue: walletsApi }
-      ]
+        { provide: WalletsApi, useValue: walletsApi },
+      ],
     });
 
     const effects = TestBed.runInInjectionContext(() => new LatestCustomerEffects());
     const results: any[] = [];
-    const sub = effects.load$.subscribe((a) => results.push(a));
+    const sub = effects.load$.subscribe(a => results.push(a));
 
     actions$.next(loadLatestCustomer({ id: '1' }));
     expect(results[0].type).toBe(loadLatestCustomerFailure.type);
