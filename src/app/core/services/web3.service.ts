@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, forkJoin, of } from 'rxjs';
+import { catchError, map, retry } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 
@@ -72,10 +72,10 @@ export interface ChainMeta {
 
 export interface OnChainFacts {
   address: string;
-  balanceWei: string;
-  balanceEth: string;
-  txCount: number;
-  isContract: boolean;
+  balanceWei: string | null;
+  balanceEth: string | null;
+  txCount: number | null;
+  isContract: boolean | null;
 }
 
 export interface NetworkInfo {
@@ -244,6 +244,9 @@ export class Web3Service {
     return this.http
       .post<JsonRpcResponse<T>>(this.rpcUrl, { jsonrpc: '2.0', id: 1, method, params })
       .pipe(
+        // Retry transient network failures (rate-limit, dropped/cancelled requests).
+        // Logical JSON-RPC errors are thrown in map() below — AFTER retry — so they are not retried.
+        retry({ count: 2, delay: 600 }),
         map((res) => {
           // JSON-RPC errors arrive as HTTP 200 -> must be checked here.
           if (res.error) {
@@ -283,19 +286,28 @@ export class Web3Service {
 
   /** REAL: balance + activity + EOA-vs-contract for a screened address. */
   getOnChainFacts(address: string): Observable<OnChainFacts> {
+    // Per-call resilience: one failing read (rate-limit, blocked/cancelled request)
+    // must not sink the others. forkJoin only errors when EVERY read fails.
+    const orNull = <R>(read: Observable<R>): Observable<R | null> =>
+      read.pipe(catchError(() => of(null)));
     return forkJoin({
-      balance: this.getBalance(address),
-      txCount: this.getTransactionCount(address),
-      code: this.getCode(address),
+      balance: orNull(this.getBalance(address)),
+      txCount: orNull(this.getTransactionCount(address)),
+      code: orNull(this.getCode(address)),
     }).pipe(
-      map(({ balance, txCount, code }) => ({
-        address,
-        balanceWei: balance,
-        balanceEth: this.formatUnits(balance, 18),
-        txCount: this.hexToNumber(txCount),
-        // EOA returns '0x'; a contract returns its bytecode.
-        isContract: !!code && code !== '0x',
-      }))
+      map(({ balance, txCount, code }) => {
+        if (balance === null && txCount === null && code === null) {
+          throw new Error('All on-chain reads failed');
+        }
+        return {
+          address,
+          balanceWei: balance,
+          balanceEth: balance !== null ? this.formatUnits(balance, 18) : null,
+          txCount: txCount !== null ? this.hexToNumber(txCount) : null,
+          // EOA returns '0x'; a contract returns its bytecode.
+          isContract: code !== null ? !!code && code !== '0x' : null,
+        };
+      })
     );
   }
 

@@ -47,6 +47,7 @@
           <div>
             <div class="web3-label">{{ 'customers.walletNumber' | translate }}</div>
             <div class="web3-value web3-mono web3-chip-mono">{{ c.walletNumber }}</div>
+            <p class="web3-hint">{{ 'web3.context.walletNote' | translate }}</p>
           </div>
         </div>
       } @else {
@@ -171,19 +172,29 @@
       <div class="web3-facts motion-stagger motion-stagger--rise">
         <div class="web3-fact">
           <div class="web3-label">{{ 'web3.facts.balance' | translate }}</div>
-          <div class="web3-value web3-fact-strong">{{ f.balanceEth }} ETH</div>
+          <div class="web3-value web3-fact-strong">{{ f.balanceEth !== null ? f.balanceEth + ' ETH' : '—' }}</div>
         </div>
         <div class="web3-fact">
           <div class="web3-label">{{ 'web3.facts.txCount' | translate }}</div>
-          <div class="web3-value web3-fact-strong"><span [appCountUp]="f.txCount"></span></div>
+          <div class="web3-value web3-fact-strong">
+            @if (f.txCount !== null) {
+              <span [appCountUp]="f.txCount"></span>
+            } @else {
+              —
+            }
+          </div>
         </div>
         <div class="web3-fact">
           <div class="web3-label">{{ 'web3.facts.type' | translate }}</div>
-          <app-ui-badge
-            [color]="f.isContract ? 'blue' : 'teal'"
-            [icon]="f.isContract ? 'ri-file-code-line' : 'ri-wallet-line'"
-            [text]="(f.isContract ? 'web3.facts.contract' : 'web3.facts.eoa') | translate"
-          ></app-ui-badge>
+          @if (f.isContract !== null) {
+            <app-ui-badge
+              [color]="f.isContract ? 'blue' : 'teal'"
+              [icon]="f.isContract ? 'ri-file-code-line' : 'ri-wallet-line'"
+              [text]="(f.isContract ? 'web3.facts.contract' : 'web3.facts.eoa') | translate"
+            ></app-ui-badge>
+          } @else {
+            <span class="web3-value">—</span>
+          }
         </div>
       </div>
       <a class="web3-link" [href]="addressExplorerUrl()" target="_blank" rel="noopener noreferrer">
@@ -355,5 +366,6 @@
         ></app-ui-badge>
       </div>
     }
+    <p class="web3-hint">{{ 'web3.record.demoNote' | translate }}</p>
   </div>
 </div>

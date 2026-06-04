@@ -16,6 +16,7 @@ import { EMPTY } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
 
 import { CustomersApi } from '@core/api/customers.api';
+import { ToastService } from '@core/services/toast.service';
 import {
   ChainMeta,
   NetworkInfo,
@@ -67,6 +68,7 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
   private readonly customersApi = inject(CustomersApi);
   private readonly web3 = inject(Web3Service);
   private readonly i18n = inject(TranslateService);
+  private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
   private walletCleanup: (() => void) | null = null;
@@ -201,7 +203,10 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
         next: (facts) => {
           this.facts.set(facts);
           this.assessment.set(
-            this.web3.assessRisk({ isContract: facts.isContract, txCount: facts.txCount }, signals)
+            this.web3.assessRisk(
+              { isContract: facts.isContract ?? undefined, txCount: facts.txCount ?? undefined },
+              signals
+            )
           );
           this.screening.set(false);
         },
@@ -268,6 +273,11 @@ export class Web3RiskComponent implements OnInit, OnDestroy {
 
   record(decision: RiskDecision): void {
     this.recommendation.set(decision);
+    this.toast.success(
+      this.i18n.instant('web3.record.toast', {
+        decision: this.i18n.instant(`web3.decision.${decision}`),
+      })
+    );
   }
 
   back(): void {

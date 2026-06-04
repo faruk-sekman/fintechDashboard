@@ -154,7 +154,8 @@
     "context": {
       "title": "Müşteri bağlamı",
       "subtitle": "Beyan edilen cüzdanını taradığınız müşteri",
-      "kyc": "Mevcut KYC durumu"
+      "kyc": "Mevcut KYC durumu",
+      "walletNote": "Vaka çalışması hesap numarası — zincir-üstü adres değildir."
     },
     "operator": {
       "title": "Operatör cüzdanı",
@@ -242,7 +243,9 @@
       "allow": "İzin ver",
       "review": "İncele",
       "block": "Engelle",
-      "recorded": "Öneri kaydedildi — {{decision}} (demo, kalıcı değil)"
+      "recorded": "Öneri kaydedildi — {{decision}} (demo, kalıcı değil)",
+      "toast": "Karar kaydedildi: {{decision}}",
+      "demoNote": "Yalnızca demo — karar yerel olarak gösterilir, bir sunucuya kaydedilmez."
     },
     "signMessage": "Fintech Ops uyum denetimi — taranan cüzdan {{address}}"
   }

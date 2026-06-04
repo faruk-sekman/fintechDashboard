@@ -20,7 +20,29 @@
 
 ---
 
+<a id="project-brief"></a>
+## Project Brief
+
+This project was built as a frontend case study for a fintech back-office workflow. The
+scenario is a small operations team that needs one place to review customer status, inspect
+wallet limits, follow transaction activity, and make a first-pass risk decision before taking
+KYC or compliance action.
+
+The application solves that workflow end to end: the dashboard gives portfolio-level KPIs,
+the customer list supports search/filter/pagination, detail pages expose wallet and
+transaction operations, create/edit screens enforce business validations, and the Web3 risk
+screen adds a read-only compliance layer for wallet screening. The Web3 area intentionally
+separates live on-chain facts from deterministic demo signals, so the operator can see what
+is real data and what is simulated decision support.
+
+From an engineering perspective, the project demonstrates a production-minded Angular
+frontend: lazy-loaded standalone routes, NgRx state/effects, shared UI components, TR/EN
+i18n, light/dark theming, centralized API/interceptor handling, and Vitest coverage.
+
+---
+
 ## 📚 Table of Contents
+- [Project Brief](#project-brief)
 - [Overview](#overview)
 - [Feature Highlights](#feature-highlights)
 - [Web3 Risk &amp; Compliance](#web3-risk--compliance)
@@ -78,6 +100,12 @@ non-custodial Web3 risk screen** that pulls live on-chain facts to inform KYC de
 
 A standout, **honest** Web3 screen: every value is labeled **🟢 REAL** (live on-chain) or
 **🟡 SIMULATED** (deterministic demo). Reachable from any customer via **"Web3 Risk Check"**.
+
+> [!NOTE]
+> The case-study REST API returns synthetic account numbers (not EVM addresses), so the
+> screen accepts any pasted `0x` address — deliberately decoupled from the customer record.
+> Live reads use a public JSON-RPC node and retry on transient failure; if all reads fail
+> the panel degrades gracefully instead of breaking.
 
 ```mermaid
 flowchart TD

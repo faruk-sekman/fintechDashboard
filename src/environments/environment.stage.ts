@@ -4,7 +4,7 @@ export const environment = {
   defaultLanguage: 'tr',
   web3: {
     // Public, key-free Ethereum mainnet RPC (swap via env). Real on-chain reads.
-    rpcUrl: 'https://cloudflare-eth.com',
+    rpcUrl: 'https://ethereum-rpc.publicnode.com',
     chainId: 1,
     chainName: 'Ethereum Mainnet',
     explorerBaseUrl: 'https://etherscan.io',

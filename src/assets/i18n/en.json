@@ -154,7 +154,8 @@
     "context": {
       "title": "Customer context",
       "subtitle": "The customer whose declared wallet you are screening",
-      "kyc": "Current KYC status"
+      "kyc": "Current KYC status",
+      "walletNote": "Case-study account number — not an on-chain address."
     },
     "operator": {
       "title": "Operator wallet",
@@ -242,7 +243,9 @@
       "allow": "Allow",
       "review": "Review",
       "block": "Block",
-      "recorded": "Recommendation recorded — {{decision}} (demo, not persisted)"
+      "recorded": "Recommendation recorded — {{decision}} (demo, not persisted)",
+      "toast": "Decision recorded: {{decision}}",
+      "demoNote": "Demo only — the decision is shown locally and not saved to a backend."
     },
     "signMessage": "Fintech Ops compliance audit — screening wallet {{address}}"
   }

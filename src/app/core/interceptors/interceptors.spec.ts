@@ -6,6 +6,7 @@ import { loadingInterceptor } from '@core/interceptors/loading.interceptor';
 import { errorInterceptor } from '@core/interceptors/error.interceptor';
 import { LoadingService } from '@core/services/loading.service';
 import { AppErrorService } from '@core/services/app-error.service';
+import { environment } from '../../../environments/environment';
 
 describe('HTTP interceptors', () => {
   const loadingMock = { start: vi.fn(), end: vi.fn() };
@@ -54,5 +55,17 @@ describe('HTTP interceptors', () => {
     ).rejects.toBe(httpError);
 
     expect(appErrorMock.handleHttpError).toHaveBeenCalledWith(httpError, '/test');
+  });
+
+  it('errorInterceptor skips web3 RPC failures (handled gracefully by the service)', async () => {
+    const req = new HttpRequest('POST', environment.web3.rpcUrl, {});
+    const httpError = new HttpErrorResponse({ status: 0, url: environment.web3.rpcUrl });
+    const next = vi.fn(() => throwError(() => httpError));
+
+    await expect(
+      TestBed.runInInjectionContext(() => lastValueFrom(errorInterceptor(req, next)))
+    ).rejects.toBe(httpError);
+
+    expect(appErrorMock.handleHttpError).not.toHaveBeenCalled();
   });
 });
