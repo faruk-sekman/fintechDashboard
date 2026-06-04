@@ -145,5 +145,105 @@
     "notFound": "Record not found.",
     "unknown": "Unexpected error occurred.",
     "validation": "Please check the form fields."
+  },
+  "web3": {
+    "title": "Web3 Risk & Compliance",
+    "subtitle": "Read-only on-chain wallet risk intelligence to inform a KYC decision",
+    "riskCheck": "Web3 Risk Check",
+    "back": "Back to customer",
+    "context": {
+      "title": "Customer context",
+      "subtitle": "The customer whose declared wallet you are screening",
+      "kyc": "Current KYC status"
+    },
+    "operator": {
+      "title": "Operator wallet",
+      "subtitle": "Optional — connect your own wallet for an audit attestation",
+      "connect": "Connect wallet",
+      "disconnect": "Disconnect",
+      "account": "Account",
+      "chain": "Chain",
+      "sign": "Sign audit attestation (optional)",
+      "signed": "Audit signature captured",
+      "signatureHint": "Signature only — no transaction, no custody, no private keys."
+    },
+    "wallet": {
+      "notFound": "No browser wallet detected. Read-only screening still works.",
+      "rejected": "Wallet connection was rejected.",
+      "error": "Could not connect to the wallet."
+    },
+    "screen": {
+      "title": "Screened wallet address",
+      "subtitle": "Pre-filled with a real public sample address. Paste any address to screen it.",
+      "placeholder": "0x… (42 characters)",
+      "invalid": "Enter a valid 0x address (40 hex characters).",
+      "action": "Screen wallet",
+      "checksumNote": "Format check only — full EIP-55 checksum is out of scope."
+    },
+    "facts": {
+      "title": "On-chain facts",
+      "subtitle": "Live, key-free JSON-RPC reads from the configured node",
+      "real": "REAL on-chain",
+      "balance": "Balance",
+      "txCount": "Transactions sent (nonce)",
+      "type": "Account type",
+      "eoa": "EOA (wallet)",
+      "contract": "Contract",
+      "explorer": "View on explorer",
+      "error": "Could not read on-chain data right now. Please try again.",
+      "loading": "Reading the chain…"
+    },
+    "network": {
+      "chainId": "Chain ID",
+      "block": "Latest block",
+      "gas": "Gas price"
+    },
+    "risk": {
+      "title": "Risk intelligence",
+      "subtitle": "Deterministic demo signals derived from the address",
+      "simulated": "Simulated / demo data",
+      "decision": "Recommendation",
+      "lastTx": "Last seen tx (simulated)",
+      "explanationLabel": "Heuristic explanation"
+    },
+    "sim": {
+      "providers": "Real screening would call Chainalysis / TRM Labs / OFAC. These signals are simulated demo data, not live AML intelligence."
+    },
+    "signals": {
+      "mixerExposure": "Mixer exposure",
+      "highVelocity": "High transaction velocity",
+      "suspiciousCounterparty": "Suspicious counterparty",
+      "sanctionsHit": "Sanctions list hit"
+    },
+    "signalState": {
+      "clear": "Clear",
+      "flagged": "Flagged"
+    },
+    "decision": {
+      "ALLOW": "Allow",
+      "REVIEW": "Review",
+      "BLOCK": "Block"
+    },
+    "explanation": {
+      "none": "no risk signals",
+      "template": "Heuristic assessment: {{count}} signal(s) flagged ({{list}}). Recommended action: {{decision}}. (rule-based)"
+    },
+    "vc": {
+      "title": "Verifiable credential (concept preview)",
+      "subtitle": "Illustrative W3C VC. No real cryptographic verification is performed.",
+      "simulated": "Concept preview — simulated",
+      "proofValid": "Proof valid — simulated",
+      "flow": "In production: issuer signs → holder stores → verifier checks the proof. No PII goes on-chain."
+    },
+    "record": {
+      "title": "Compliance decision",
+      "subtitle": "Record your recommendation for this screening",
+      "engineSuggests": "Engine suggests",
+      "allow": "Allow",
+      "review": "Review",
+      "block": "Block",
+      "recorded": "Recommendation recorded — {{decision}} (demo, not persisted)"
+    },
+    "signMessage": "Fintech Ops compliance audit — screening wallet {{address}}"
   }
 }

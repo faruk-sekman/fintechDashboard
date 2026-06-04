@@ -1,4 +1,4 @@
-import { ApplicationConfig, ErrorHandler, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, ErrorHandler } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
 import { provideRouter } from '@angular/router';
@@ -12,8 +12,8 @@ import { loadingInterceptor } from '@core/interceptors/loading.interceptor';
 import { errorInterceptor } from '@core/interceptors/error.interceptor';
 import { GlobalErrorHandler } from '@core/services/global-error-handler';
 
-import { TranslateLoader, TranslateModule, TranslateModuleConfig} from '@ngx-translate/core';
-import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translate/http-loader';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { environment } from '../environments/environment';
 import { customersReducer } from '@features/customers/state/customers/customers.reducer';
 import { CustomersEffects } from '@features/customers/state/customers/customers.effects';
@@ -44,16 +44,10 @@ export const appConfig: ApplicationConfig = {
     provideEffects([CustomersEffects, TransactionsEffects, LatestCustomerEffects, AppErrorEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: environment.production }),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
-    importProvidersFrom(
-      TranslateModule.forRoot({
-        defaultLanguage: environment.defaultLanguage,
-        loader: { provide: TranslateLoader, useClass: TranslateHttpLoader },
-        
-      })
-    ),
-    {
-      provide: TRANSLATE_HTTP_LOADER_CONFIG,
-      useValue: { prefix: '/assets/i18n/', suffix: '.json' }
-    }
+    provideTranslateService({
+      fallbackLang: environment.defaultLanguage,
+      lang: environment.defaultLanguage
+    }),
+    ...provideTranslateHttpLoader({ prefix: '/assets/i18n/', suffix: '.json' })
   ]
 };

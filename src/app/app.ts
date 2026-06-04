@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, type TranslationObject } from '@ngx-translate/core';
 import { environment } from '../environments/environment';
 import { registerLocaleData } from '@angular/common';
 import localeTr from '@angular/common/locales/tr';
 import localeEn from '@angular/common/locales/en';
+import trTranslations from '../assets/i18n/tr.json';
+import enTranslations from '../assets/i18n/en.json';
 
 @Component({
   selector: 'app-root',
@@ -17,11 +19,22 @@ export class App implements OnInit {
   constructor(private i18n: TranslateService) {
     registerLocaleData(localeTr);
     registerLocaleData(localeEn);
+    this.i18n.setTranslation('tr', trTranslations as TranslationObject);
+    this.i18n.setTranslation('en', enTranslations as TranslationObject);
   }
 
   ngOnInit(): void {
-    const saved = localStorage.getItem('lang');
-    const lang = saved === 'tr' || saved === 'en' ? saved : environment.defaultLanguage;
+    const lang = this.readSavedLanguage() ?? environment.defaultLanguage;
     this.i18n.use(lang);
+  }
+
+  private readSavedLanguage(): 'en' | 'tr' | null {
+    try {
+      if (typeof localStorage === 'undefined') return null;
+      const saved = localStorage.getItem('lang');
+      return saved === 'tr' || saved === 'en' ? saved : null;
+    } catch {
+      return null;
+    }
   }
 }

@@ -54,7 +54,7 @@ app-dashboard {
     overflow: hidden;
 
     &::after {
-      background: radial-gradient(circle, rgb(var(--color-ink-rgb) / 0.1), transparent 70%);
+      background: radial-gradient(circle, rgb(var(--color-ink-rgb) / 10%), transparent 70%);
     }
 
     &--age::after {
@@ -91,6 +91,16 @@ app-dashboard {
     min-height: 150px;
     position: relative;
     overflow: hidden;
+    transition:
+      transform var(--motion-duration-base) var(--motion-ease-emphasized),
+      border-color var(--motion-duration-base) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-base) var(--motion-ease-standard);
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-md);
+    }
 
     &::after {
       content: "";
@@ -100,12 +110,17 @@ app-dashboard {
       width: 120px;
       height: 120px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgb(var(--color-ink-rgb) / 0.06), transparent 70%);
+      background: radial-gradient(circle, rgb(var(--color-ink-rgb) / 6%), transparent 70%);
       pointer-events: none;
+      transition: transform var(--motion-duration-slow) var(--motion-ease-emphasized);
+    }
+
+    &:hover::after {
+      transform: scale(1.35);
     }
 
     &--slate::after {
-      background: radial-gradient(circle, rgb(var(--color-ink-rgb) / 0.12), transparent 70%);
+      background: radial-gradient(circle, rgb(var(--color-ink-rgb) / 12%), transparent 70%);
     }
 
     &--teal::after {
@@ -147,6 +162,9 @@ app-dashboard {
 
   .mini-fill {
     height: 100%;
+    transform-origin: left center;
+    animation: ui-grow-x var(--motion-duration-slow) var(--motion-ease-emphasized) both;
+    animation-delay: 140ms;
 
     &--active {
       background: var(--color-success-strong);
@@ -214,6 +232,10 @@ app-dashboard {
     display: block;
     height: 100%;
     background: linear-gradient(90deg, var(--color-chart-muted-from), var(--color-chart-muted-to));
+    transition: width var(--motion-duration-slow) var(--motion-ease-emphasized);
+    transform-origin: left center;
+    animation: ui-grow-x var(--motion-duration-slow) var(--motion-ease-emphasized) both;
+    animation-delay: 160ms;
 
     &--verified {
       background: linear-gradient(90deg, var(--color-chart-verified-from), var(--color-chart-verified-to));
@@ -249,6 +271,10 @@ app-dashboard {
     gap: var(--space-4);
   }
 
+  .user-grid.motion-stagger {
+    --stagger-step: 55ms;
+  }
+
   .user-card {
     display: flex;
     align-items: flex-start;
@@ -257,6 +283,16 @@ app-dashboard {
     border-radius: calc(var(--radius-sm) + 2px);
     background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-3) 100%);
     border: 1px solid var(--color-border);
+    transition:
+      transform var(--motion-duration-base) var(--motion-ease-emphasized),
+      border-color var(--motion-duration-base) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-base) var(--motion-ease-standard);
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-md);
+    }
   }
 
   .user-avatar {

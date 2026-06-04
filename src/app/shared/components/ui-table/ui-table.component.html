@@ -21,7 +21,7 @@
       </thead>
 
       @if (!loading) {
-        <tbody>
+        <tbody class="motion-stagger motion-stagger--rise">
           @for (row of data; track $index) {
             <tr>
               @for (c of columns; track c.key) {

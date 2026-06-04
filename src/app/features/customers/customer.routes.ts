@@ -16,5 +16,9 @@ export const customerRoutes: Routes = [
   {
     path: ':id/edit',
     loadComponent: () => import('@features/customers/pages/customer-form/customer-form.component').then((m) => m.CustomerFormComponent)
+  },
+  {
+    path: ':id/web3-risk',
+    loadComponent: () => import('@features/customers/pages/web3-risk/web3-risk.component').then((m) => m.Web3RiskComponent)
   }
 ];

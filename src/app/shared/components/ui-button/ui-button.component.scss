@@ -3,23 +3,31 @@
 }
 
 .ui-button {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
   border-radius: var(--radius-md);
   font-weight: var(--font-weight-medium);
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+  transition:
+    transform var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
   outline: none;
   border: none;
 
-  &:focus {
-    box-shadow: 0 0 0 4px var(--color-focus-ring);
+  &:focus-visible {
+    box-shadow: var(--shadow-focus);
   }
 
   &:disabled {
     cursor: not-allowed;
     opacity: 0.6;
+    transform: none;
   }
 
   &--sm {
@@ -51,6 +59,26 @@
 
     &:hover:not(:disabled) {
       background: var(--color-primary-hover);
+      box-shadow: 0 8px 20px rgb(var(--color-ink-rgb) / 18%);
+    }
+
+    // One-shot light sweep on hover (21st.dev community feel).
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 40%;
+      height: 100%;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgb(255 255 255 / 22%), transparent);
+      transform: translateX(-150%) skewX(-12deg);
+      opacity: 0;
+    }
+
+    &:hover:not(:disabled)::after {
+      opacity: 1;
+      animation: ui-sheen-sweep 0.7s var(--motion-ease-standard);
     }
   }
 

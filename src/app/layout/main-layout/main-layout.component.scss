@@ -15,7 +15,6 @@
   z-index: 60;
   display: grid;
   align-items: start;
-  
 }
 
 .mobile-nav__panel {
@@ -52,13 +51,27 @@
   background: var(--color-surface);
   color: var(--color-text);
   cursor: pointer;
+  transition:
+    transform var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
 
   &:hover {
     background: var(--color-surface-3);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .mobile-nav {
     display: none;
   }

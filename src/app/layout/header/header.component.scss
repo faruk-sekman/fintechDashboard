@@ -59,9 +59,18 @@
   background: var(--color-surface);
   color: var(--color-text);
   cursor: pointer;
+  transition:
+    transform var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
 
   &:hover {
     background: var(--color-surface-3);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
   }
 }
 
@@ -126,6 +135,14 @@
   font-weight: var(--font-weight-extrabold);
   color: var(--color-text-strong);
   cursor: pointer;
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard);
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
 }
 
 .theme button {
@@ -151,7 +168,7 @@
   transition: width 0.25s ease;
 }
 
-@media (max-width: 860px) {
+@media (width <= 860px) {
   .header-row {
     flex-wrap: wrap;
     gap: var(--space-5);
@@ -173,20 +190,21 @@
   }
 }
 
-@media (max-width: 1024px) {
+@media (width <= 1024px) {
   .menu-toggle {
     display: inline-flex!important;
   }
 }
-@media (max-width: 780px) {
+
+@media (width <= 780px) {
   .header-row {
     padding-right: 0.75rem;
     padding-left: 0.75rem;
   }
 
 }
-@media (max-width: 640px) {
-  
+
+@media (width <= 640px) {
   .right {
     justify-content: space-between;
   }

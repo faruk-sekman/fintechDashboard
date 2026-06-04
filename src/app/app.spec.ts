@@ -3,6 +3,7 @@ import { App } from './app';
 
 class TranslateMock {
   use = vi.fn();
+  setTranslation = vi.fn();
 }
 
 describe('App', () => {
@@ -25,6 +26,18 @@ describe('App', () => {
     const app = new App(i18n as any);
 
     app.ngOnInit();
+    expect(i18n.use).toHaveBeenCalledWith('tr');
+  });
+
+  it('falls back when localStorage is unavailable', () => {
+    const originalLocalStorage = (globalThis as any).localStorage;
+    (globalThis as any).localStorage = undefined;
+    const i18n = new TranslateMock();
+    const app = new App(i18n as any);
+
+    app.ngOnInit();
+    (globalThis as any).localStorage = originalLocalStorage;
+
     expect(i18n.use).toHaveBeenCalledWith('tr');
   });
 });

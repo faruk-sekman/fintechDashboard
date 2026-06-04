@@ -8,14 +8,14 @@
 
   @if (summaryVm$ | async; as vm) {
     @let loading = (customersLoading$ | async);
-    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid gap-3 motion-stagger sm:grid-cols-2 xl:grid-cols-4">
       <div class="card kpi-card stat-card kpi-card--slate">
         <div class="metric-label metric-label--icon">
           <i class="ri-group-line" aria-hidden="true"></i>
           <span>{{ 'dashboard.kpi.totalCustomers' | translate }}</span>
         </div>
         @if (!loading) {
-          <div class="metric-value metric-value--xl">{{ vm.total | number }}</div>
+          <div class="metric-value metric-value--xl"><span [appCountUp]="vm.total"></span></div>
           <div class="stat-meta">
             <div class="stat-chip">
               <span class="dot dot--active"></span>
@@ -37,7 +37,7 @@
           <span>{{ 'dashboard.kpi.activeRate' | translate }}</span>
         </div>
         @if (!loading) {
-          <div class="metric-value">{{ vm.activeRate }}%</div>
+          <div class="metric-value"><span [appCountUp]="vm.activeRate"></span>%</div>
         } @else {
           <ng-container [ngTemplateOutlet]="kpiValueSkeleton"></ng-container>
         }
@@ -70,7 +70,11 @@
         </div>
         @if (!loading) {
           <div class="metric-value metric-value--xl">
-            {{ vm.avgAge !== null ? (vm.avgAge + ' ' + ('dashboard.labels.years' | translate)) : ('common.noData' | translate) }}
+            @if (vm.avgAge !== null) {
+              <span [appCountUp]="vm.avgAge"></span> {{ 'dashboard.labels.years' | translate }}
+            } @else {
+              {{ 'common.noData' | translate }}
+            }
           </div>
           <div class="stat-meta">
             @if (vm.minAge !== null && vm.maxAge !== null) {
@@ -103,7 +107,7 @@
               <div class="chart-row">
                 <div class="chart-label">
                   <app-customer-status-badge [status]="item.status"></app-customer-status-badge>
-                  <span class="chart-count">{{ item.count }}</span>
+                  <span class="chart-count" [appCountUp]="item.count"></span>
                 </div>
                 <div class="chart-bar">
                   <span
@@ -125,14 +129,14 @@
       </div>
     </div>
 
-    <div class="grid gap-3 md:grid-cols-2">
+    <div class="grid gap-3 motion-stagger md:grid-cols-2">
       <div class="card kpi-card kpi-card--purple">
         <div class="metric-label metric-label--icon">
           <i class="ri-team-line" aria-hidden="true"></i>
           <span>{{ 'dashboard.kpi.userCards' | translate }}</span>
         </div>
         @if (!loading) {
-          <div class="user-grid grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
+          <div class="user-grid motion-stagger grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
             @for (user of internalUsers; track user.username) {
               <div class="user-card flex flex-col sm:flex-row">
                 <div class="user-avatar" aria-hidden="true">

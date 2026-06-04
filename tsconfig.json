@@ -12,6 +12,7 @@
     "isolatedModules": true,
     "experimentalDecorators": true,
     "importHelpers": true,
+    "resolveJsonModule": true,
     "rootDir": "./src",
     "outDir": "./out-tsc/base",
     "target": "ES2022",

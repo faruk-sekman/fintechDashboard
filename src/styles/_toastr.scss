@@ -50,6 +50,7 @@ html[data-theme="dark"] {
     overflow: hidden;
     line-height: var(--line-height-base);
     font-size: var(--font-size-xl);
+
     &::after {
       content: "";
       position: absolute;
@@ -76,28 +77,28 @@ html[data-theme="dark"] {
   .toast-success {
     --toast-accent: var(--color-success);
     --toast-accent-rgb: var(--color-success-rgb);
-    --toast-accent-soft: rgba(var(--color-success-rgb) / 0.1);
+    --toast-accent-soft: rgba(var(--color-success-rgb) / 10%);
     --toast-bg: var(--toast-success-bg);
   }
 
   .toast-error {
     --toast-accent: var(--color-danger);
     --toast-accent-rgb: var(--color-danger-rgb);
-    --toast-accent-soft: rgba(var(--color-danger-rgb) / 0.1);
+    --toast-accent-soft: rgba(var(--color-danger-rgb) / 10%);
     --toast-bg: var(--toast-error-bg);
   }
 
   .toast-info {
     --toast-accent: var(--color-info);
     --toast-accent-rgb: var(--toast-info-rgb);
-    --toast-accent-soft: rgba(var(--toast-info-rgb) / 0.1);
+    --toast-accent-soft: rgba(var(--toast-info-rgb) / 10%);
     --toast-bg: var(--toast-info-bg);
   }
 
   .toast-warning {
     --toast-accent: var(--toast-warning);
     --toast-accent-rgb: var(--toast-warning-rgb);
-    --toast-accent-soft: rgba(var(--toast-warning-rgb) / 0.12);
+    --toast-accent-soft: rgba(var(--toast-warning-rgb) / 12%);
     --toast-bg: var(--toast-warning-bg);
   }
 
@@ -116,7 +117,7 @@ html[data-theme="dark"] {
     color: var(--toast-accent);
     background: var(--toast-accent-soft);
     border-radius: 999px;
-    box-shadow: inset 0 0 0 1px rgba(var(--toast-accent-rgb) / 0.35);
+    box-shadow: inset 0 0 0 1px rgba(var(--toast-accent-rgb) / 35%);
     opacity: 0.95;
   }
 

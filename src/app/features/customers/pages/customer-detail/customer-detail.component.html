@@ -26,6 +26,10 @@
           <i class="ri-pencil-line ui-button__icon" aria-hidden="true"></i>
           {{ 'common.edit' | translate }}
         </app-ui-button>
+        <app-ui-button variant="ghost" type="button" (click)="web3Risk()">
+          <i class="ri-shield-check-line ui-button__icon" aria-hidden="true"></i>
+          {{ 'web3.riskCheck' | translate }}
+        </app-ui-button>
         <app-ui-button variant="danger" type="button" (click)="openDelete()">
           <i class="ri-delete-bin-6-line ui-button__icon" aria-hidden="true"></i>
           {{ 'common.delete' | translate }}
@@ -36,7 +40,7 @@
 
   @if (customer; as c) {
     <div class="card detail-summary">
-      <div class="detail-summary__grid">
+      <div class="detail-summary__grid motion-stagger">
         <div class="detail-pill">
           <div class="detail-label">{{ 'customers.name' | translate }}</div>
           <div class="detail-value">{{ c.name }}</div>
@@ -86,7 +90,7 @@
     </div>
   }
 
-  <div class="detail-split">
+  <div class="detail-split motion-stagger">
     <div class="card">
       <div class="card-title">{{ 'wallet.title' | translate }}</div>
       <div class="card-sub">{{ 'wallet.subtitle' | translate }}</div>
@@ -95,7 +99,7 @@
         <div class="wallet">
           <div class="balance">
             <div class="detail-label">{{ 'wallet.balance' | translate }}</div>
-            <div class="detail-value">{{ w.balance | number:'1.2-2' }} {{ w.currency }}</div>
+            <div class="detail-value"><span [appCountUp]="w.balance" [countUpDecimals]="2"></span> {{ w.currency }}</div>
           </div>
 
           <div class="limits">

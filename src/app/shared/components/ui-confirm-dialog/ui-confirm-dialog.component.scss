@@ -7,6 +7,8 @@
   justify-content: center;
   padding: var(--space-8);
   background: var(--color-overlay);
+  backdrop-filter: blur(4px);
+  animation: ui-backdrop-in var(--motion-duration-base) var(--motion-ease-standard) both;
 }
 
 .confirm-card {
@@ -16,6 +18,7 @@
   background: var(--color-surface);
   padding: var(--space-10);
   box-shadow: var(--shadow-lg);
+  animation: ui-scale-in var(--motion-duration-base) var(--motion-spring-soft) both;
 }
 
 .confirm-icon {
@@ -28,6 +31,8 @@
   color: var(--color-danger-strong);
   font-size: var(--font-size-xl);
   margin-bottom: var(--space-7);
+  animation: ui-pop-in var(--motion-duration-slow) var(--motion-spring-soft) both;
+  animation-delay: 90ms;
 }
 
 .confirm-title {

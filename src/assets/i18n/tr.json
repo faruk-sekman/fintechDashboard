@@ -145,5 +145,105 @@
     "notFound": "Kayıt bulunamadı.",
     "unknown": "Beklenmeyen bir hata oluştu.",
     "validation": "Lütfen form alanlarını kontrol edin."
+  },
+  "web3": {
+    "title": "Web3 Risk & Uyum",
+    "subtitle": "KYC kararına destek için salt-okunur zincir-üstü cüzdan risk istihbaratı",
+    "riskCheck": "Web3 Risk Kontrolü",
+    "back": "Müşteriye dön",
+    "context": {
+      "title": "Müşteri bağlamı",
+      "subtitle": "Beyan edilen cüzdanını taradığınız müşteri",
+      "kyc": "Mevcut KYC durumu"
+    },
+    "operator": {
+      "title": "Operatör cüzdanı",
+      "subtitle": "Opsiyonel — denetim imzası için kendi cüzdanınızı bağlayın",
+      "connect": "Cüzdan bağla",
+      "disconnect": "Bağlantıyı kes",
+      "account": "Hesap",
+      "chain": "Zincir",
+      "sign": "Denetim imzası ver (opsiyonel)",
+      "signed": "Denetim imzası alındı",
+      "signatureHint": "Yalnızca imza — işlem yok, saklama (custody) yok, özel anahtar yok."
+    },
+    "wallet": {
+      "notFound": "Tarayıcı cüzdanı bulunamadı. Salt-okunur tarama yine de çalışır.",
+      "rejected": "Cüzdan bağlantısı reddedildi.",
+      "error": "Cüzdana bağlanılamadı."
+    },
+    "screen": {
+      "title": "Taranan cüzdan adresi",
+      "subtitle": "Gerçek, herkese açık örnek bir adresle dolduruldu. Taramak için herhangi bir adres yapıştırın.",
+      "placeholder": "0x… (42 karakter)",
+      "invalid": "Geçerli bir 0x adresi girin (40 hex karakter).",
+      "action": "Cüzdanı tara",
+      "checksumNote": "Yalnızca format kontrolü — tam EIP-55 checksum kapsam dışıdır."
+    },
+    "facts": {
+      "title": "Zincir-üstü veriler",
+      "subtitle": "Yapılandırılmış düğümden canlı, anahtarsız JSON-RPC okumaları",
+      "real": "GERÇEK zincir-üstü",
+      "balance": "Bakiye",
+      "txCount": "Gönderilen işlem (nonce)",
+      "type": "Hesap tipi",
+      "eoa": "EOA (cüzdan)",
+      "contract": "Sözleşme",
+      "explorer": "Gezginde görüntüle",
+      "error": "Zincir-üstü veri şu an okunamadı. Lütfen tekrar deneyin.",
+      "loading": "Zincir okunuyor…"
+    },
+    "network": {
+      "chainId": "Zincir ID",
+      "block": "Son blok",
+      "gas": "Gas fiyatı"
+    },
+    "risk": {
+      "title": "Risk istihbaratı",
+      "subtitle": "Adresten türetilen deterministik demo sinyalleri",
+      "simulated": "Simüle / demo veri",
+      "decision": "Öneri",
+      "lastTx": "Son görülen işlem (simüle)",
+      "explanationLabel": "Sezgisel (heuristic) açıklama"
+    },
+    "sim": {
+      "providers": "Gerçek tarama Chainalysis / TRM Labs / OFAC çağırırdı. Bu sinyaller simüle demo veridir, canlı AML istihbaratı değildir."
+    },
+    "signals": {
+      "mixerExposure": "Mixer teması",
+      "highVelocity": "Yüksek işlem hızı",
+      "suspiciousCounterparty": "Şüpheli karşı taraf",
+      "sanctionsHit": "Yaptırım listesi eşleşmesi"
+    },
+    "signalState": {
+      "clear": "Temiz",
+      "flagged": "İşaretli"
+    },
+    "decision": {
+      "ALLOW": "İzin ver",
+      "REVIEW": "İncele",
+      "BLOCK": "Engelle"
+    },
+    "explanation": {
+      "none": "risk sinyali yok",
+      "template": "Sezgisel değerlendirme: {{count}} sinyal işaretlendi ({{list}}). Önerilen aksiyon: {{decision}}. (kural tabanlı)"
+    },
+    "vc": {
+      "title": "Doğrulanabilir kimlik bilgisi (kavram önizlemesi)",
+      "subtitle": "Örnek bir W3C VC. Gerçek kriptografik doğrulama yapılmaz.",
+      "simulated": "Kavram önizlemesi — simüle",
+      "proofValid": "Kanıt geçerli — simüle",
+      "flow": "Üretimde: düzenleyen imzalar → sahip saklar → doğrulayan kanıtı kontrol eder. Hiçbir PII zincire yazılmaz."
+    },
+    "record": {
+      "title": "Uyum kararı",
+      "subtitle": "Bu tarama için önerinizi kaydedin",
+      "engineSuggests": "Motor önerisi",
+      "allow": "İzin ver",
+      "review": "İncele",
+      "block": "Engelle",
+      "recorded": "Öneri kaydedildi — {{decision}} (demo, kalıcı değil)"
+    },
+    "signMessage": "Fintech Ops uyum denetimi — taranan cüzdan {{address}}"
   }
 }

@@ -8,6 +8,7 @@ import { distinctUntilChanged, filter, map, takeUntil } from 'rxjs/operators';
 import { Customer, KycStatus } from '@shared/models/customer.model';
 import { UiBadgeComponent } from '@shared/components/ui-badge/ui-badge.component';
 import { UiSkeletonComponent } from '@shared/components/ui-skeleton/ui-skeleton.component';
+import { CountUpDirective } from '@shared/directives/count-up.directive';
 import { KYC_STATUS_ORDER } from '@shared/utils/kyc-status';
 import { CustomerStatusBadgeComponent } from '@features/customers/components/customer-status-badge/customer-status-badge.component';
 import { CustomersStore } from '@features/customers/state';
@@ -30,7 +31,7 @@ interface DashboardViewModel {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule, UiBadgeComponent, UiSkeletonComponent, CustomerStatusBadgeComponent],
+  imports: [CommonModule, RouterLink, TranslateModule, UiBadgeComponent, UiSkeletonComponent, CustomerStatusBadgeComponent, CountUpDirective],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })

@@ -11,11 +11,10 @@
 
 .ui-select {
   @include mixins.control-base;
-  @include mixins.control-states();
+  @include mixins.control-states;
+
   padding-right: var(--space-14);
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
 }
 
 .ui-select__icon {

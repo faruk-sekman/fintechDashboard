@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { customerRoutes } from '@features/customers/customer.routes';
 
 describe('customer routes', () => {
-  it('defines list, create, detail and edit routes', () => {
+  it('defines list, create, detail, edit and web3-risk routes', () => {
     const paths = customerRoutes.map((r) => r.path);
-    expect(paths).toEqual(['', 'new', ':id', ':id/edit']);
+    expect(paths).toEqual(['', 'new', ':id', ':id/edit', ':id/web3-risk']);
   });
 
   it('resolves lazy components', async () => {

@@ -21,6 +21,7 @@ $badge-variants: (
 
 .ui-badge {
   box-shadow: inset 0 0 0 1px var(--badge-ring);
+  transition: box-shadow var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 @each $name, $values in $badge-variants {
@@ -28,6 +29,7 @@ $badge-variants: (
     --badge-bg: #{list.nth($values, 1)};
     --badge-text: #{list.nth($values, 2)};
     --badge-ring: #{list.nth($values, 3)};
+
     background: var(--badge-bg);
     color: var(--badge-text);
   }

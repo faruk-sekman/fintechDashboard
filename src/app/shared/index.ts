@@ -15,6 +15,7 @@ export { UiSelectComponent } from '@shared/components/ui-select/ui-select.compon
 export { UiSkeletonComponent } from '@shared/components/ui-skeleton/ui-skeleton.component';
 export { UiTableComponent } from '@shared/components/ui-table/ui-table.component';
 export * from '@shared/components/ui-table/ui-table.types';
+export { CountUpDirective } from '@shared/directives/count-up.directive';
 export * from '@shared/utils/kyc-status';
 export * from '@shared/utils/http-params.util';
 export * from '@shared/validators/custom.validators';

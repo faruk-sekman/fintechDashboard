@@ -24,7 +24,7 @@ export class HeaderComponent {
 
   switchLang(lang: 'en' | 'tr') {
     this.i18n.use(lang);
-    localStorage.setItem('lang', lang);
+    this.persistLang(lang);
   }
 
   currentLang(): 'en' | 'tr' {
@@ -33,5 +33,15 @@ export class HeaderComponent {
 
   setTheme(mode: 'light' | 'dark') {
     this.themeService.setTheme(mode);
+  }
+
+  private persistLang(lang: 'en' | 'tr') {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('lang', lang);
+      }
+    } catch {
+      // Language remains active in memory when browser storage is unavailable.
+    }
   }
 }

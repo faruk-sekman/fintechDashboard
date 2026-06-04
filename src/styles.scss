@@ -8,10 +8,7 @@
 @use "./styles/toastr" as app-toastr;
 @use "ngx-toastr/toastr" as ngx-toastr;
 @import "remixicon/fonts/remixicon.css";
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap');
-
-
-
+@import 'https://fonts.googleapis.com/css2?family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

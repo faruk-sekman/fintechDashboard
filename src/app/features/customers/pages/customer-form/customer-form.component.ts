@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -35,7 +35,7 @@ import {
   templateUrl: './customer-form.component.html',
   styleUrl: './customer-form.component.scss'
 })
-export class CustomerFormComponent implements OnInit, OnDestroy {
+export class CustomerFormComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(UiFormComponent) uiForm?: UiFormComponent;
   private destroy$ = new Subject<void>();
   private submit$ = new Subject<{ value: any; form: UiFormComponent }>();
@@ -53,7 +53,8 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     private api: CustomersApi,
     private toast: ToastService,
     private appError: AppErrorService,
-    private i18n: TranslateService
+    private i18n: TranslateService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -66,6 +67,8 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
         this.loading = !!id;
         this.initialValue = id ? null : { isActive: true };
         this.fields = this.buildFields(this.mode);
+        // Zoneless app: notify change detection after async state changes.
+        this.cdr?.markForCheck();
       }),
       filter((id): id is string => !!id),
       switchMap((id) =>
@@ -80,6 +83,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
           }),
           finalize(() => {
             this.loading = false;
+            this.cdr?.markForCheck();
           })
         )
       ),
@@ -89,6 +93,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     this.submit$.pipe(
       exhaustMap(({ value, form }) => {
         this.loading = true;
+        this.cdr?.markForCheck();
         const req$ = this.mode === 'create'
           ? this.api.create(this.toCreatePayload(value))
           : this.api.update(this.id!, this.toUpdatePayload(value));
@@ -111,6 +116,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
           }),
           finalize(() => {
             this.loading = false;
+            this.cdr?.markForCheck();
           })
         );
       }),
@@ -121,6 +127,13 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  ngAfterViewInit(): void {
+    const form = this.uiForm?.form;
+    if (!form) return;
+    form.setValidators([...(this.uiForm?.formValidators ?? [])]);
+    form.updateValueAndValidity({ emitEvent: false });
   }
 
   back() {

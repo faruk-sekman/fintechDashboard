@@ -20,6 +20,7 @@ import { UiFormComponent } from '@shared/components/ui-form/ui-form.component';
 import { UiSkeletonComponent } from '@shared/components/ui-skeleton/ui-skeleton.component';
 import { UiTableComponent } from '@shared/components/ui-table/ui-table.component';
 import { UiConfirmDialogComponent } from '@shared/components/ui-confirm-dialog/ui-confirm-dialog.component';
+import { CountUpDirective } from '@shared/directives/count-up.directive';
 import { CustomerStatusBadgeComponent } from '@features/customers/components/customer-status-badge/customer-status-badge.component';
 import { ColumnDef } from '@shared/components/ui-table/ui-table.types';
 import { FieldConfig, SelectOption } from '@shared/components/ui-form/ui-form.types';
@@ -37,7 +38,8 @@ import { TransactionsStore, CustomersStore } from '@features/customers/state';
     UiFormComponent,
     UiSkeletonComponent,
     CustomerStatusBadgeComponent,
-    UiConfirmDialogComponent
+    UiConfirmDialogComponent,
+    CountUpDirective
   ],
   templateUrl: './customer-detail.component.html',
   styleUrl: './customer-detail.component.scss'
@@ -293,6 +295,7 @@ export class CustomerDetailComponent implements OnInit, OnDestroy, AfterViewInit
 
   back() { this.router.navigate(['/customers']); }
   edit() { this.router.navigate(['/customers', this.id, 'edit']); }
+  web3Risk() { this.router.navigate(['/customers', this.id, 'web3-risk']); }
 
   openDelete() {
     this.deleteModalOpen = true;

@@ -4,16 +4,33 @@ import { BehaviorSubject } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class LoadingService {
   private active = 0;
+  private emitQueued = false;
+  private lastEmitted = false;
   private readonly _loading$ = new BehaviorSubject<boolean>(false);
   readonly loading$ = this._loading$.asObservable();
 
   start() {
     this.active++;
-    if (this.active === 1) this._loading$.next(true);
+    this.queueEmit();
   }
 
   end() {
     this.active = Math.max(0, this.active - 1);
-    if (this.active === 0) this._loading$.next(false);
+    this.queueEmit();
+  }
+
+  private queueEmit() {
+    if (this.emitQueued) return;
+    this.emitQueued = true;
+
+    queueMicrotask(() => {
+      this.emitQueued = false;
+      const next = this.active > 0;
+
+      if (next !== this.lastEmitted) {
+        this.lastEmitted = next;
+        this._loading$.next(next);
+      }
+    });
   }
 }
