@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CustomerDetailComponent } from './customer-detail.component';
 import { CustomersStore, TransactionsStore } from '@features/customers/state';
 import { BehaviorSubject, of, Subject, throwError } from 'rxjs';
@@ -167,6 +167,26 @@ describe('CustomerDetailComponent', () => {
     );
   });
 
+  it('dispatchTransactionsLoad treats null filter values as empty filters', () => {
+    const { component } = createComponent();
+    component.id = '9';
+    component.txFilterInitialValue.set(null as any);
+    (component as any).txFiltersForm = undefined;
+
+    (component as any).dispatchTransactionsLoad();
+
+    expect(transactionsStoreMock.load).toHaveBeenCalledWith(
+      '9',
+      expect.objectContaining({
+        type: undefined,
+        transferDirection: undefined,
+        currency: undefined,
+        from: undefined,
+        to: undefined,
+      }),
+    );
+  });
+
   it('syncTxRangeValidity returns true when form is missing', () => {
     const { component } = createComponent();
     (component as any).txFiltersForm = undefined;
@@ -202,8 +222,12 @@ describe('CustomerDetailComponent', () => {
     const creditCol = component.txColumns[1];
     const dirCol = component.txColumns[2];
     expect(creditCol.badgeIcon?.('CREDIT')).toBe('ri-bank-card-2-line');
+    expect(creditCol.badgeIcon?.('DEBIT')).toBe('ri-bank-card-line');
+    expect(creditCol.badgeColor?.('CREDIT')).toBe('indigo');
     expect(creditCol.badgeColor?.('DEBIT')).toBe('blue');
     expect(dirCol.badgeIcon?.('INCOMING')).toBe('ri-arrow-down-line');
+    expect(dirCol.badgeIcon?.('OUTGOING')).toBe('ri-arrow-up-line');
+    expect(dirCol.badgeColor?.('INCOMING')).toBe('purple');
     expect(dirCol.badgeColor?.('OUTGOING')).toBe('pink');
   });
 
@@ -267,6 +291,21 @@ describe('CustomerDetailComponent', () => {
     expect(true).toBe(true);
   });
 
+  it('resetLimits falls back to null limits when no initial values exist', () => {
+    const { component } = createComponent();
+    const form = new FormGroup({
+      dailyLimit: new FormControl(1),
+      monthlyLimit: new FormControl(2),
+    });
+    component.limitsInitialValue.set(null);
+    component.limitsForm = { form } as any;
+
+    component.resetLimits();
+
+    expect(form.get('dailyLimit')?.value).toBeNull();
+    expect(form.get('monthlyLimit')?.value).toBeNull();
+  });
+
   it('setupTxStream safely exits when form is missing', () => {
     const { component } = createComponent();
     (component as any).txFiltersForm = undefined;
@@ -297,11 +336,14 @@ describe('CustomerDetailComponent', () => {
 
     component.back();
     component.edit();
+    component.web3Risk();
 
     component.openDelete();
     component.confirmDelete();
     expect(customersStoreMock.delete).toHaveBeenCalledWith('1');
-    expect(router.navigate).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/customers']);
+    expect(router.navigate).toHaveBeenCalledWith(['/customers', '1', 'edit']);
+    expect(router.navigate).toHaveBeenCalledWith(['/customers', '1', 'web3-risk']);
   });
 
   it('confirmDelete exits when deleting or missing id', () => {
@@ -309,6 +351,11 @@ describe('CustomerDetailComponent', () => {
     component.deletingCustomer.set(true);
     component.id = '1';
     component.confirmDelete();
+
+    component.deletingCustomer.set(false);
+    component.id = '';
+    component.confirmDelete();
+
     expect(customersStoreMock.delete).not.toHaveBeenCalled();
   });
 
@@ -321,9 +368,11 @@ describe('CustomerDetailComponent', () => {
   it('ngOnInit loads customer and wallet and handles saveLimits', () => {
     const param$ = new BehaviorSubject(convertToParamMap({ id: '1' }));
     const deleteSuccess$ = new Subject<{ id: string }>();
+    const deleting$ = new BehaviorSubject<boolean>(false);
+    const deletingId$ = new BehaviorSubject<string | null>(null);
     const customersStore = {
-      deleting$: of(false),
-      deletingId$: of(null),
+      deleting$,
+      deletingId$,
       deleteSuccess$,
       delete: vi.fn(),
     };
@@ -356,6 +405,19 @@ describe('CustomerDetailComponent', () => {
     expect(customersApi.getById).toHaveBeenCalledWith('1');
     expect(walletsApi.getByCustomerId).toHaveBeenCalledWith('1');
 
+    component.limitsForm = undefined;
+    component.saveLimits();
+    expect(walletsApi.updateLimits).not.toHaveBeenCalled();
+
+    component.limitsForm = {
+      form: new FormGroup({
+        dailyLimit: new FormControl(null, Validators.required),
+        monthlyLimit: new FormControl(3),
+      }),
+    } as any;
+    component.saveLimits();
+    expect(walletsApi.updateLimits).not.toHaveBeenCalled();
+
     component.limitsForm = {
       form: new FormGroup({ dailyLimit: new FormControl(2), monthlyLimit: new FormControl(3) }),
     } as any;
@@ -366,6 +428,12 @@ describe('CustomerDetailComponent', () => {
     expect(component.showTxSkeleton()).toBe(true);
     loading$.next(false);
     expect(component.showTxSkeleton()).toBe(false);
+
+    deleting$.next(true);
+    deletingId$.next('2');
+    expect(component.deletingCustomer()).toBe(false);
+    deletingId$.next('1');
+    expect(component.deletingCustomer()).toBe(true);
 
     component.openDelete();
     deleteSuccess$.next({ id: '1' });

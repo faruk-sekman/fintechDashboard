@@ -8,6 +8,7 @@ import {
   walletLimitsConsistencyValidator,
   turkishNationalIdValidator,
   trimmedRequiredValidator,
+  digitsLengthValidator,
   noMultipleSpacesValidator,
   fullNameValidator,
   safeTextValidator,
@@ -98,55 +99,88 @@ describe('custom validators', () => {
 
   it('trimmedRequiredValidator checks whitespace only', () => {
     const validator = trimmedRequiredValidator();
+    expect(validator(new FormControl(null))).toBeNull();
+    expect(validator(new FormControl(undefined))).toBeNull();
+    expect(validator(new FormControl(123))).toBeNull();
     expect(validator(new FormControl('   '))).toEqual({ required: true });
     expect(validator(new FormControl('a'))).toBeNull();
   });
 
+  it('digitsLengthValidator validates digit-only length after stripping separators', () => {
+    const validator = digitsLengthValidator({ min: 3, max: 5 });
+    expect(validator(new FormControl(''))).toBeNull();
+    expect(validator(new FormControl('abc'))).toBeNull();
+    expect(validator(new FormControl('12'))).toEqual({
+      minlength: { requiredLength: 3, actualLength: 2 },
+    });
+    expect(validator(new FormControl('12-3456'))).toEqual({
+      maxlength: { requiredLength: 5, actualLength: 6 },
+    });
+    expect(validator(new FormControl('12-345'))).toBeNull();
+  });
+
   it('noMultipleSpacesValidator detects multiple spaces', () => {
     const validator = noMultipleSpacesValidator();
+    expect(validator(new FormControl(''))).toBeNull();
     expect(validator(new FormControl('a  b'))).toEqual({ multipleSpaces: true });
     expect(validator(new FormControl('a b'))).toBeNull();
   });
 
   it('fullNameValidator validates multi-part names', () => {
     const validator = fullNameValidator();
+    expect(validator(new FormControl(''))).toBeNull();
+    expect(validator(new FormControl('John  Doe'))).toEqual({ multipleSpaces: true });
     expect(validator(new FormControl('John'))).toEqual({ surnameRequired: true });
     expect(validator(new FormControl('J D'))).toEqual({ nameInvalid: true });
+    expect(validator(new FormControl('John D0e'))).toEqual({ nameInvalid: true });
     expect(validator(new FormControl('John Doe'))).toBeNull();
   });
 
   it('safeTextValidator blocks unsafe chars', () => {
     const validator = safeTextValidator();
+    expect(validator(new FormControl(''))).toBeNull();
     expect(validator(new FormControl('<script>'))).toEqual({ unsafeChars: true });
+    expect(validator(new FormControl('Hello\u0000'))).toEqual({ unsafeChars: true });
     expect(validator(new FormControl('Hello'))).toBeNull();
   });
 
   it('nameValidator validates name format', () => {
     const validator = nameValidator();
+    expect(validator(new FormControl(''))).toBeNull();
     expect(validator(new FormControl('1'))).toEqual({ nameInvalid: true });
     expect(validator(new FormControl('John Doe'))).toBeNull();
   });
 
   it('phoneNumberValidator validates digits', () => {
     const validator = phoneNumberValidator();
+    expect(validator(new FormControl(''))).toBeNull();
     expect(validator(new FormControl('abc'))).toEqual({ phoneInvalid: true });
     expect(validator(new FormControl('+90 5551112233'))).toEqual({ phoneInvalid: true });
     expect(validator(new FormControl('90555-111-2233'))).toEqual({ phoneInvalid: true });
+    expect(validator(new FormControl('123456'))).toEqual({ phoneInvalid: true });
+    expect(validator(new FormControl('905551112233'))).toBeNull();
     expect(validator(new FormControl('+905551112233'))).toBeNull();
   });
 
   it('walletNumberValidator validates length and digits', () => {
     const validator = walletNumberValidator();
+    expect(validator(new FormControl(''))).toBeNull();
+    expect(validator(new FormControl('123456789012345a'))).toEqual({
+      walletNumberInvalid: true,
+    });
     expect(validator(new FormControl('123'))).toEqual({ walletNumberInvalid: true });
     expect(validator(new FormControl('1234567890123456'))).toBeNull();
   });
 
   it('strictEmailValidator validates email format', () => {
     const validator = strictEmailValidator();
+    expect(validator(new FormControl(''))).toBeNull();
     expect(validator(new FormControl('a@b'))).toEqual({ email: true });
+    expect(validator(new FormControl('a@'))).toEqual({ email: true });
     expect(validator(new FormControl('a..b@c.com'))).toEqual({ email: true });
     const longLocal = `${'a'.repeat(65)}@example.com`;
     expect(validator(new FormControl(longLocal))).toEqual({ email: true });
+    expect(validator(new FormControl(`${'a'.repeat(255)}@example.com`))).toEqual({ email: true });
     expect(validator(new FormControl('a@b.com'))).toBeNull();
   });
 
@@ -157,6 +191,7 @@ describe('custom validators', () => {
     expect(validator(new FormControl('2024-13-01'))).toEqual({ dateInvalid: true });
     expect(validator(new FormControl('2024-02-30'))).toEqual({ dateInvalid: true });
     expect(validator(new FormControl('3000-01-01'))).toEqual({ dateInFuture: true });
+    expect(validator(new FormControl('1899-12-31'))).toEqual({ dateInvalid: true });
     const young = new Date();
     young.setFullYear(young.getFullYear() - 10);
     const youngStr = `${young.getFullYear()}-${String(young.getMonth() + 1).padStart(2, '0')}-${String(young.getDate()).padStart(2, '0')}`;
@@ -171,5 +206,8 @@ describe('custom validators', () => {
     const dob = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
     const dobStr = `${dob.getFullYear()}-${String(dob.getMonth() + 1).padStart(2, '0')}-${String(dob.getDate()).padStart(2, '0')}`;
     expect(validator(new FormControl(dobStr))).toBeNull();
+
+    const noBounds = dateOfBirthValidator();
+    expect(noBounds(new FormControl(dobStr))).toBeNull();
   });
 });

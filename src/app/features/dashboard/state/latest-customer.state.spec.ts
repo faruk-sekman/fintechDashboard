@@ -20,6 +20,7 @@ import {
 } from '@features/dashboard/state/latest-customer.reducer';
 import {
   selectLatestCustomer,
+  selectLatestCustomerError,
   selectLatestCustomerLoaded,
   selectLatestCustomerLoading,
   selectLatestCustomerWallet,
@@ -58,11 +59,12 @@ describe('LatestCustomer state', () => {
   });
 
   it('selectors project state', () => {
-    const state = { ...initialState, customer, wallet, loading: true, loaded: false };
+    const state = { ...initialState, customer, wallet, loading: true, loaded: false, error: 'x' };
     expect(selectLatestCustomer.projector(state)).toBe(customer);
     expect(selectLatestCustomerWallet.projector(state)).toBe(wallet);
     expect(selectLatestCustomerLoading.projector(state)).toBe(true);
     expect(selectLatestCustomerLoaded.projector(state)).toBe(false);
+    expect(selectLatestCustomerError.projector(state)).toBe('x');
   });
 
   it('LatestCustomerStore dispatches load', () => {

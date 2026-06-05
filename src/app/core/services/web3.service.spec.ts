@@ -52,6 +52,12 @@ describe('Web3Service', () => {
     it('returns 0 for un-parseable input', () => {
       expect(make().formatUnits('not-a-hex')).toBe('0');
     });
+
+    it('handles negative values and precision trimming', () => {
+      const s = make();
+      expect(s.formatUnits('-1000000000000000000')).toBe('-1');
+      expect(s.formatUnits('0x1', 18, 0)).toBe('0');
+    });
   });
 
   describe('hexToNumber', () => {
@@ -61,6 +67,7 @@ describe('Web3Service', () => {
       expect(s.hexToNumber('0x2a')).toBe(42);
       expect(s.hexToNumber('0x')).toBe(0);
       expect(s.hexToNumber('')).toBe(0);
+      expect(s.hexToNumber('not-a-hex')).toBe(0);
     });
   });
 
@@ -148,6 +155,25 @@ describe('Web3Service', () => {
       off();
     });
 
+    it('returns a no-op cleanup when provider events are incomplete', () => {
+      const provider = {
+        request: vi.fn(),
+        on: vi.fn(),
+      };
+      const previous = window.ethereum;
+      window.ethereum = provider as any;
+      try {
+        const off = make().onWalletEvents({
+          onAccountsChanged: () => undefined,
+          onChainChanged: () => undefined,
+        });
+        off();
+        expect(provider.on).not.toHaveBeenCalled();
+      } finally {
+        window.ethereum = previous;
+      }
+    });
+
     it('connectWallet rejects with a typed no-wallet error', async () => {
       await expect(make().connectWallet()).rejects.toMatchObject({ message: 'no-wallet' });
     });
@@ -156,6 +182,23 @@ describe('Web3Service', () => {
       await expect(make().personalSign('0xabc', 'audit')).rejects.toMatchObject({
         message: 'no-wallet',
       });
+    });
+
+    it('connectWallet returns an empty address when provider has no accounts', async () => {
+      const provider = {
+        request: vi.fn(async (args: { method: string }) => {
+          if (args.method === 'eth_requestAccounts') return [];
+          if (args.method === 'eth_chainId') return '0x1';
+          return null;
+        }),
+      };
+      const previous = window.ethereum;
+      window.ethereum = provider as any;
+      try {
+        await expect(make().connectWallet()).resolves.toEqual({ address: '', chainIdHex: '0x1' });
+      } finally {
+        window.ethereum = previous;
+      }
     });
   });
 
@@ -199,6 +242,39 @@ describe('Web3Service', () => {
       expect(facts.balanceEth).toBe('1');
       expect(facts.txCount).toBe(42);
       expect(facts.isContract).toBe(false);
+    });
+
+    it('getOnChainFacts fails only when every read fails logically', async () => {
+      const http = {
+        post: vi.fn(() => of({ error: { code: -32000, message: 'rpc fail' } })),
+      };
+      await expect(
+        lastValueFrom(new Web3Service(http as never).getOnChainFacts('0xabc')),
+      ).rejects.toThrow(/All on-chain reads failed/);
+    });
+
+    it('getOnChainFacts keeps partial facts when only some reads fail', async () => {
+      const http = {
+        post: vi.fn((_url: string, body: { method: string }) => {
+          if (body.method === 'eth_getBalance') {
+            return of({ error: { code: -32000, message: 'balance fail' } });
+          }
+          if (body.method === 'eth_getTransactionCount') return of({ result: '0x2a' });
+          if (body.method === 'eth_getCode') {
+            return of({ error: { code: -32000, message: 'code fail' } });
+          }
+          return of({ result: '0x0' });
+        }),
+      };
+
+      const partial = await lastValueFrom(
+        new Web3Service(http as never).getOnChainFacts('0xabc'),
+      );
+
+      expect(partial.balanceWei).toBeNull();
+      expect(partial.balanceEth).toBeNull();
+      expect(partial.txCount).toBe(42);
+      expect(partial.isContract).toBeNull();
     });
 
     it('getNetworkInfo maps chainId, block and gas price', async () => {
@@ -245,10 +321,22 @@ describe('Web3Service', () => {
         expect(await s.personalSign(op.address, 'audit')).toBe('0xsignature');
 
         const off = s.onWalletEvents({
-          onAccountsChanged: () => undefined,
-          onChainChanged: () => undefined,
+          onAccountsChanged: accounts => {
+            expect(accounts).toEqual([]);
+          },
+          onChainChanged: chainIdHex => {
+            expect(chainIdHex).toBe('0x');
+          },
         });
         expect(provider.on).toHaveBeenCalledWith('accountsChanged', expect.any(Function));
+        const accountsHandler = provider.on.mock.calls.find(
+          call => call[0] === 'accountsChanged',
+        )?.[1];
+        const chainHandler = provider.on.mock.calls.find(call => call[0] === 'chainChanged')?.[1];
+        expect(accountsHandler).toBeTypeOf('function');
+        expect(chainHandler).toBeTypeOf('function');
+        accountsHandler?.();
+        chainHandler?.();
         off();
         expect(provider.removeListener).toHaveBeenCalled();
       } finally {

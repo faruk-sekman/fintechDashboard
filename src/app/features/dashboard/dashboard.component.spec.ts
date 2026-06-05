@@ -146,6 +146,27 @@ describe('DashboardComponent', () => {
     sub.unsubscribe();
   });
 
+  it('keeps unknown kyc statuses visible without breaking ordered dashboard totals', () => {
+    const { component, data$ } = createComponent(of(0));
+    (component as any).kycStatusOrder = ['VERIFIED', 'ARCHIVED'];
+    const results: any[] = [];
+    const sub = component.summaryVm$.subscribe(v => results.push(v));
+
+    data$.next([
+      { ...customerA, kycStatus: 'ARCHIVED' },
+      { ...customerB, kycStatus: 'VERIFIED' },
+    ]);
+
+    const latest = results.at(-1);
+    expect(latest?.kycList).toEqual([
+      { status: 'VERIFIED', count: 1 },
+      { status: 'ARCHIVED', count: 1 },
+    ]);
+    expect(latest?.kycPercents?.VERIFIED).toBe(50);
+    expect(latest?.kycPercents?.ARCHIVED).toBe(50);
+    sub.unsubscribe();
+  });
+
   it('uses data length when total is zero and handles empty kyc totals', () => {
     const { component, data$ } = createComponent(of(0));
     const results: any[] = [];
@@ -155,6 +176,21 @@ describe('DashboardComponent', () => {
     expect(latest?.total).toBe(0);
     expect(latest?.kycTotal).toBe(0);
     expect(latest?.kycPercents?.UNKNOWN).toBe(0);
+    sub.unsubscribe();
+  });
+
+  it('keeps inactive totals non-negative when reported total is lower than active customers', () => {
+    const { component, data$ } = createComponent(of(1));
+    const results: any[] = [];
+    const sub = component.summaryVm$.subscribe(v => results.push(v));
+
+    data$.next([{ ...customerA, id: 'a' }, { ...customerA, id: 'b' }]);
+
+    const latest = results.at(-1);
+    expect(latest?.total).toBe(1);
+    expect(latest?.activeCount).toBe(2);
+    expect(latest?.inactiveCount).toBe(0);
+    expect(latest?.inactiveRate).toBe(0);
     sub.unsubscribe();
   });
 
@@ -187,9 +223,33 @@ describe('DashboardComponent', () => {
     expect(age).toBe(29);
   });
 
+  it('getAge adjusts when birthday month has not occurred yet', () => {
+    const { component } = createComponent();
+    const today = new Date();
+    const isDecember = today.getMonth() === 11;
+    const dob = new Date(
+      today.getFullYear() - (isDecember ? 29 : 30),
+      isDecember ? 0 : today.getMonth() + 1,
+      1,
+    );
+    const iso = `${dob.getFullYear()}-${String(dob.getMonth() + 1).padStart(2, '0')}-${String(dob.getDate()).padStart(2, '0')}`;
+    const age = (component as any).getAge(iso);
+    expect(age).toBe(29);
+  });
+
   it('ngOnDestroy completes subscriptions', () => {
     const { component } = createComponent();
     component.ngOnDestroy();
     expect(true).toBe(true);
+  });
+
+  it('does not load latest customer when customers stream emits null', () => {
+    const { component, data$, latestStore } = createComponent();
+    component.ngOnInit();
+
+    data$.next(null as any);
+
+    expect(latestStore.load).not.toHaveBeenCalled();
+    component.ngOnDestroy();
   });
 });

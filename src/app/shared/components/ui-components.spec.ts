@@ -462,7 +462,45 @@ describe('Shared UI components', () => {
 
     expect((form as any).deepEqual({ a: [1] }, { a: [1] })).toBe(true);
     expect((form as any).deepEqual({ a: [1] }, { a: [2] })).toBe(false);
+    expect((form as any).deepEqual(null, null)).toBe(true);
+    expect((form as any).deepEqual(null, {})).toBe(false);
+    expect((form as any).deepEqual(1, '1')).toBe(false);
+    expect((form as any).deepEqual([1], { 0: 1 })).toBe(false);
+    expect((form as any).deepEqual([1], [1, 2])).toBe(false);
+    expect((form as any).deepEqual({ a: 1 }, { a: 1, b: 2 })).toBe(false);
+    expect((form as any).deepEqual({ a: 1 }, { b: 1 })).toBe(false);
     expect((form as any).normalizeValue([{ a: 1 }])).toEqual([{ a: 1 }]);
+  });
+
+  it('UiFormComponent covers neutral field states and class filtering', () => {
+    const form = new UiFormComponent(new TranslateMock() as any);
+    form.fields = [
+      { name: 'name', labelKey: 'name', type: 'text' } as any,
+      { name: 'status', labelKey: 'status', type: 'text' } as any,
+    ];
+    form.ngOnChanges({ fields: new SimpleChange(null, form.fields, true) });
+
+    expect(form.fieldState('missing')).toBeNull();
+    expect(form.getError('missing')).toBeNull();
+    expect(form.displayError('missing')).toBeNull();
+
+    const name = form.control('name');
+    expect(form.fieldState('name')).toBeNull();
+    name.disable();
+    expect(form.fieldState('name')).toBeNull();
+    name.enable();
+
+    const pending = form.control('status');
+    pending.markAsPending();
+    expect(form.fieldState('status')).toBeNull();
+
+    const classes = form.controlClass('name', ['kept', 123 as any, 'also-kept']);
+    expect(classes['kept']).toBe(true);
+    expect(classes['also-kept']).toBe(true);
+    expect(classes['123']).toBeUndefined();
+
+    expect(form.fieldId('address.city', 2)).toBe('ui-form-2-address-city');
+    expect(form.dateInputLang()).toBe('en-US');
   });
 
   it('UiFormComponent maps validation errors', () => {
@@ -505,8 +543,24 @@ describe('Shared UI components', () => {
   it('UiConfirmDialogComponent and UiSkeletonComponent instantiate', () => {
     const dialog = new UiConfirmDialogComponent();
     const skeleton = new UiSkeletonComponent();
+    const cancel = vi.fn();
+    dialog.cancel.subscribe(cancel);
+
+    dialog.onEscape();
+    expect(cancel).not.toHaveBeenCalled();
+
     dialog.open = true;
     expect(dialog.open).toBe(true);
+    dialog.loading = true;
+    dialog.onEscape();
+    expect(cancel).not.toHaveBeenCalled();
+
+    dialog.loading = false;
+    dialog.onEscape();
+    expect(cancel).toHaveBeenCalledTimes(1);
+    expect(dialog.titleId).toContain('confirm-title-');
+    expect(dialog.messageId).toContain('confirm-message-');
+
     skeleton.width = '10px';
     skeleton.height = '8px';
     skeleton.radius = '4px';

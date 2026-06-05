@@ -53,4 +53,36 @@ describe('Layout components', () => {
     expect(new MainLayoutComponent()).toBeTruthy();
     expect(new SidebarComponent()).toBeTruthy();
   });
+
+  it('MainLayoutComponent toggles mobile nav state', () => {
+    const component = new MainLayoutComponent();
+
+    component.toggleMobileNav();
+    expect(component.mobileNavOpen).toBe(true);
+
+    component.closeMobileNav();
+    expect(component.mobileNavOpen).toBe(false);
+  });
+
+  it('MainLayoutComponent prepares and updates route animation keys', async () => {
+    const component = new MainLayoutComponent();
+    const inactiveOutlet = { isActivated: false } as any;
+    const customerOutlet = {
+      isActivated: true,
+      activatedRoute: { snapshot: { routeConfig: { path: 'customers' } } },
+    } as any;
+    const homeOutlet = {
+      isActivated: true,
+      activatedRoute: { snapshot: { routeConfig: {} } },
+    } as any;
+
+    component.routeKey.set('existing');
+    expect(component.prepareRoute(inactiveOutlet)).toBe('existing');
+    expect(component.prepareRoute(customerOutlet)).toBe('customers');
+    expect(component.prepareRoute(homeOutlet)).toBe('home');
+
+    component.updateRoute(customerOutlet);
+    await Promise.resolve();
+    expect(component.routeKey()).toBe('customers');
+  });
 });

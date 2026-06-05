@@ -97,6 +97,27 @@ describe('DashboardStats state', () => {
     sub.unsubscribe();
   });
 
+  it('DashboardStatsEffects defaults missing list payload fields safely', () => {
+    const actions$ = new Subject<any>();
+    const api = { list: vi.fn(() => of({ data: null, total: null })) };
+
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: Actions, useValue: new Actions(actions$) },
+        { provide: CustomersApi, useValue: api },
+      ],
+    });
+
+    const effects = TestBed.runInInjectionContext(() => new DashboardStatsEffects());
+    const results: any[] = [];
+    const sub = effects.load$.subscribe(a => results.push(a));
+
+    actions$.next(loadDashboardStats({ params }));
+
+    expect(results[0]).toEqual(loadDashboardStatsSuccess({ data: [], total: 0 }));
+    sub.unsubscribe();
+  });
+
   it('DashboardStatsEffects emits failure action on error', () => {
     const actions$ = new Subject<any>();
     const api = { list: vi.fn(() => throwError(() => new Error('fail'))) };
