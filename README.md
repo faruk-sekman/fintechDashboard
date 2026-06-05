@@ -73,7 +73,9 @@ non-custodial Web3 risk screen** that pulls live on-chain facts to inform KYC de
 > key-free Ethereum JSON-RPC node. **No private keys, no transaction sending, no custody.**
 
 > [!IMPORTANT]
-> Minimum line-coverage gate: **80%+** — current: **~90%**.
+> Coverage quality gate: **every covered source file must keep statements, branches,
+> functions, and lines at 90%+**. Current full-suite coverage is **99%+ statements**,
+> **95%+ branches**, **100% functions**, and **99%+ lines**.
 
 ---
 
@@ -345,10 +347,27 @@ npx vitest --run                  # run only
 npx vitest --run --coverage       # coverage only
 ```
 
-Current: **~90% lines** across **32 spec files**. CI gate (fail < 80% lines):
+Current full-suite result: **33 spec files**, **266 tests**, and no covered source file below
+90% on statements, branches, functions, or lines.
+
+| Metric | Current |
+|---|---:|
+| Statements | 99.29% |
+| Branches | 95.55% |
+| Functions | 100% |
+| Lines | 99.75% |
+
+Enterprise coverage standard:
+
+- Unit tests should assert real behavior and edge cases, not just execute code for numbers.
+- Each covered source file should stay at **90%+** for `statements`, `branches`, `functions`, and `lines`.
+- Web3 tests use mocked EIP-1193 / JSON-RPC boundaries; they do not call live wallets or external RPCs.
+- Validation should include both the Vitest threshold and a file-level coverage scan.
+
+File-level coverage check:
 
 ```bash
-node -e "const s=require('./coverage/coverage-summary.json');const p=s.total.lines.pct;console.log('Lines:',p+'%');process.exit(p>=80?0:1);"
+node -e "const s=require('./coverage/coverage-summary.json');const bad=[];for(const [file,m] of Object.entries(s)){if(file==='total')continue;const miss=['statements','branches','functions','lines'].filter(k=>m[k].pct<90);if(miss.length)bad.push(file+': '+miss.map(k=>k+' '+m[k].pct+'%').join(', '));}if(bad.length){console.error(bad.join('\n'));process.exit(1)}console.log('all-file-metrics>=90')"
 ```
 
 ---
