@@ -439,3 +439,4 @@ node -e "const s=require('./coverage/coverage-summary.json');const bad=[];for(co
 ---
 
 <div align="center"><sub>Fintech Operations Dashboard · Angular 21 · read-only Web3 · TR / EN · light / dark</sub></div>
+
